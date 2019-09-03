@@ -1,6 +1,6 @@
 # MultiMail 
 
-**MultiMail** helps you to send mails from your Laravel application from multiple email accounts. 
+**MultiMail** helps you to send mails from your Laravel application from multiple email accounts, e.g. `office@domain.com`, `contact@domain.com`, `do-not-reply@domain.com` etc.
 
 Additionally, it offers help for sending queued, translatable or bulk mails and it ships with a helper function for salutation in your emails.
 
@@ -82,16 +82,16 @@ This packages comes with a mail informel/formal salutation helper in English, Ge
 It may be used like this in your blade:
 
 	
-    {{ salutation('formal', $user) }}
+    {{ salutation('formal', $receiver) }}
 	
-	// Output for male $user "Max Mustermann"
+	// Output for male $receiver "Max Mustermann"
 	// EN: Dear Mr. Mustermann,
 	// DE: Lieber Herr Mustermann
 	// FR: Monsieur Mustermann,
 	// PT: Prezado Sr. Mustermann,
     // ES: Estimado Señor Mustermann
 	
-	// Output for female $user "Maxi Musterfrau"
+	// Output for female $receiver "Maxi Musterfrau"
 	// EN: Dear Mrs. Musterfrau,
 	// DE: Liebe Frau Musterfrau
 	// FR: Madame Musterfrau,
@@ -100,23 +100,23 @@ It may be used like this in your blade:
 	
 	
 	
-	{{ salutation('informal', $user) }}
+	{{ salutation('informal', $receiver) }}
 	
-	// Output for male "Max Mustermann"
+	// Output for male $receiver "Max Mustermann"
 	// EN: Dear Max,
 	// DE: Lieber Max
 	// FR: Cher Max,
 	// PT: Querido Max,
     // ES: Querdio Max,
 	
-	// Output for female "Maxi Musterfrau"
+	// Output for female $receiver "Maxi Musterfrau"
 	// EN: Dear Maxi,
 	// DE: Liebe Maxi
 	// FR: Chère Maxi,
 	// PT: Querida Maxi,
     // ES: Querida Maxi
 	
-If `$user` is a collection or an array of `$objects` implementing `\iwasherefirst2\Interface\Salutable`, then everyone will get his own salutation, seperated by comma. For example
+If `$receiver` is a collection or an array of `$objects` implementing `\iwasherefirst2\Interface\Salutable`, then everyone will get his own salutation, seperated by comma. For example
 
     // Dear Max, dear Maxi, ...
 	
