@@ -2,7 +2,7 @@
 
 **MultiMail** helps you to send mails from your Laravel application from multiple email accounts, e.g. `office@domain.com`, `contact@domain.com`, `do-not-reply@domain.com` etc.
 
-Additionally, it offers help for sending queued, translatable or bulk mails and it ships with a helper function for salutation in your emails.
+Additionally, it offers help for sending queued, translatable or bulk mails and it ships with a helper function for mulilanguage salutation in your emails.
 
 ## Requirments
 
