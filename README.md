@@ -46,7 +46,7 @@ The following three methods from `MultiMail` are different though:
 
 ### Basic Examples
 
-    // Send Mail - minimal example
+    // Send Mail - minimal example, receiver must be specified in mailable 
     /iwasherefirst2/MultiMail::from('email@gmail.com')->send(new /App/Mail/Invitation($user, $form)); 
 
     // Send Mail with optional parameters "to" and "locale"
