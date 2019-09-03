@@ -1,6 +1,6 @@
 # MultiMail 
 
-**MultiMail** helps you to send mails from your Laravel application from multiple different email accounts. It also offers help for sending queued, translatable or bulk mails.
+**MultiMail** helps you to send mails from your Laravel application from multiple email accounts. It also offers help for sending queued, translatable or bulk mails.
 
 ## Requirments
 
@@ -34,7 +34,9 @@ If you want to send out queued emails please install a [queue driver](https://la
     php artisan queue:table
     php artisan migrate
 
-## Usage Examples
+## Usage 
+
+### Basic Examples
 
 To send a mail, one has to pass to the method `to` a string `$to` of the email, or an object `$to` that implements the `\iwasherefirst2\Interface\Sendable` interface.
 The method from receives one of the emails specified in `config/multimail.php`. The method `send` or `queue` requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) as input:
@@ -60,10 +62,22 @@ If variables are generated in the constructor of the email, and should also be t
 	
 	// Queue mail and translate text inside constructor
 	/iwasherefirst2/MultiMail::to($to)->from('email@gmail.com')->locale('fr')->queueWithTranslatedConstructor('App/Mail/Invitation', [$user]);
-
-If a bulk message should go out, then one may do it as follows:
-
-   \iwasherefirst2\MultiMail::from('email@gmail.com')->bulk($list, $timeout, $frequency, function($to, $mailer){ $mailer->to($to)->send(new App/Mail/Invitation($user, $form))  });
-
 	
+### Bulk messages
+
+For bulk messages, you may first require a mailer object.
+
+	$mailer = /iwasherefirst2/MultiMail::getMailer('email@gmail.com' , $timeout, $frequency);
+	
+Then you can iterate through your list. The methods of the mailer object are identical to the methods used in the `Mail` facade like `to`,`cc` , `bcc`, `send`, `locale` etc.	
+
+	foreach($users as $user){
+		$mailer->to($user)->send(new /App/Mail/Invitation($user));
+	};
+
+    /iwasherefirst2/MultiMail::from('email@gmail.com')->bulk($list, $timeout, $frequency, function($to, $mailer){ $mailer->to($to)->send(new App/Mail/Invitation($user, $form))  });
+
+### Salutation
+
+This packages comes with a mail salutation solution in English, German, Frensh, Spanish and Portuguese. It covers informal or formal and for single or two users.
 	
