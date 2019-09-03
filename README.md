@@ -47,11 +47,14 @@ One may send a mail using `/iwasherefirst2/MultiMail` instead of `/Mail`. The fo
 
 ### Basic Examples
 
-    // Send Mail 
-    /iwasherefirst2/MultiMail::to($to)->from('email@gmail.com')->locale('en')->send(new /App/Mail/Invitation($user, $form));
+    // Send Mail - minimal example
+    /iwasherefirst2/MultiMail::from('email@gmail.com')->send(new /App/Mail/Invitation($user, $form)); 
+
+    // Send Mail with optional parameters `to` and `locale`
+    /iwasherefirst2/MultiMail::to('example@example.com)->from('email@gmail.com')->locale('en')->send(new /App/Mail/Invitation($user));
 	
 	// Queue Mail 
-    /iwasherefirst2/MultiMail::to($to)->from('email2@gmail.com')->locale('de')->queue(new /App/Mail/Invitation($user));
+    /iwasherefirst2/MultiMail::from('email2@gmail.com')->queue(new /App/Mail/Invitation($user));
 	
 ### Bulk messages
 
