@@ -78,7 +78,7 @@ If text that has to be translated is generated in the constructor of the mailabl
 	
 ### Salutation Helper
 
-This packages comes with a mail informel/formal salutation helper in English, German, Frensh, Spanish and Portuguese. The object `$user` needs to implement `\iwasherefirst2\Interface\Salutable`. 
+This packages comes with a informel/formal salutation helper in English, German, Frensh, Spanish and Portuguese. The object `$user` needs to implement `\iwasherefirst2\Interface\Salutable`. 
 It may be used like this in your blade:
 
 	
