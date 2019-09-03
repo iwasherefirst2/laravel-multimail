@@ -40,26 +40,26 @@ To send a mail, one has to pass to the method `to` a string `$to` of the email, 
 The method from receives one of the emails specified in `config/multimail.php`. The method `send` or `queue` requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) as input:
 
     // Send Mail 
-    \iwasherefirst2\MultiMail::to($to)->from('email@gmail.com')->send(new App/Mail/Invitation($user, $form));
+    /iwasherefirst2/MultiMail::to($to)->from('email@gmail.com')->send(new /App/Mail/Invitation($user, $form));
 	
 	// Queue Mail 
-    \iwasherefirst2\MultiMail::to($to)->from('email2@gmail.com')->queue(new App/Mail/Invitation($user));
+    /iwasherefirst2/MultiMail::to($to)->from('email2@gmail.com')->queue(new /App/Mail/Invitation($user));
 	
 One may translate the blade into a specific language with `locale` :
 	
 	// Send Mail and translate blade
-    \iwasherefirst2\MultiMail::to($to)->from('email@gmail.com')->locale('en')->send(new App/Mail/Invitation($user, $form));
+    /iwasherefirst2/MultiMail::to($to)->from('email@gmail.com')->locale('en')->send(new /App/Mail/Invitation($user, $form));
 	
 	// Queue Mail and translate blade
-    \iwasherefirst2\MultiMail::to($to)->from('email2@gmail.com')->locale('de')->queue(new App/Mail/Invitation($user));
+    /iwasherefirst2/MultiMail::to($to)->from('email2@gmail.com')->locale('de')->queue(new /App/Mail/Invitation($user));
 	
 If variables are generated in the constructor of the email, and should also be translated, then one should use the following methods:
 	
 	// Send Mail and translate text inside constructor
-    \iwasherefirst2\MultiMail::to($to)->from('email2@gmail.com')->locale('fr')->sendWithTranslatedConstructor('App/Mail/Invitation', [$user]);
+    /iwasherefirst2/MultiMail::to($to)->from('email2@gmail.com')->locale('fr')->sendWithTranslatedConstructor('App/Mail/Invitation', [$user]);
 	
 	// Queue mail and translate text inside constructor
-	\iwasherefirst2\MultiMail::to($to)->from('email@gmail.com')->locale('fr')->queueWithTranslatedConstructor('App/Mail/Invitation', [$user]);
+	/iwasherefirst2/MultiMail::to($to)->from('email@gmail.com')->locale('fr')->queueWithTranslatedConstructor('App/Mail/Invitation', [$user]);
 
 If a bulk message should go out, then one may do it as follows:
 
