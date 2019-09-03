@@ -35,13 +35,12 @@ If you want to send out queued emails please install a [queue driver](https://la
 
 ## Usage 
 
-One may send a mail using `/iwasherefirst2/MultiMail` instead of `/Mail`. The following methods are supported
+One may send a mail using `/iwasherefirst2/MultiMail` instead of `/Mail`. The methods `to`, `cc`, `bcc`, `locale` are exactly the same as provided by the [mail facade](https://laravel.com/docs/5.8/mail#sending-mail).
+The following 3 methdos from `MultiMail` are different though:
 
 | Method | Desciption|
 | ---- |------------|
-| `to($receiver)` | `$receiver` should either be a email provided as a string, or an object that implements `\iwasherefirst2\Interface\Sendable` |
 | `from($sender)` | `$sender` is one of the mails provided in `config/multimail.php` |
-| `locale($locale)` | translate blade of mailable in a locale other than the current language, and will even remember this locale if the mail is queued | 
 | `send($mailable)` | Will send the message directly, requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) |
 | `queue($mailable)` | Will send the message out in queue, requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) |
 
