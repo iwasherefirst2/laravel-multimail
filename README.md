@@ -45,7 +45,7 @@ The method from receives one of the emails specified in `config/multimail.php`. 
 	// Queue Mail 
     \iwasherefirst2\MultiMail::to($to)->from('email2@gmail.com')->queue(new App/Mail/Invitation($user));
 	
-One may pick a language with `locale`:
+One may translate the blade into a specific language with `locale` :
 	
 	// Send Mail and translate blade
     \iwasherefirst2\MultiMail::to($to)->from('email@gmail.com')->locale('en')->send(new App/Mail/Invitation($user, $form));
