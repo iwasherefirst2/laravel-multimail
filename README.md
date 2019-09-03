@@ -33,12 +33,17 @@ If you want to send out queued emails please install a [queue driver](https://la
 
 ## Usage 
 
-### Basic Examples
+One may send a mail using `/iwasherefirst2/MultiMail` instead of `/Mail`. The following methods are supported
 
-To send a mail, one has to pass to the method `to` a string `$to` of the email, or an object `$to` that implements the `\iwasherefirst2\Interface\Sendable` interface. 
-The method from receives one of the emails specified in `config/multimail.php`. 
-The method `locale` is optional for setting the language inside the blade file of the mailable.
-The method `send` or `queue` requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) as input:
+| Method | Desciption|
+| :----: |:------------:|
+| `to($receiver)` | `$receiver` should either be a email provided as a string, or an object that implements `\iwasherefirst2\Interface\Sendable` |
+| `from($sender)` | `$sender` is one of the mails provided in `config/multimail.php` |
+| `locale($locale)` | translate blade of mailable in a locale other than the current language, and will even remember this locale if the mail is queued | 
+| `send($mailable)` | Will send the message directly, requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) |
+| `queue($mailable)` | Will send the message out in queue, requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) |
+
+### Basic Examples
 
     // Send Mail 
     /iwasherefirst2/MultiMail::to($to)->from('email@gmail.com')->locale('en')->send(new /App/Mail/Invitation($user, $form));
@@ -71,8 +76,8 @@ The method `locale` will only translate the content of the blade file, not the t
 If text that has to be translated is generated in the constructor of the mailable, then one should use the following methods together with `locale`:
 	
 	// Send Mail and translate text inside constructor
-    /iwasherefirst2/MultiMail::to($to)->from('email2@gmail.com')->locale('fr')->sendWithTranslatedConstructor('App/Mail/Invitation', [$user]);
+    /iwasherefirst2/MultiMail::to($to)->from('email2@gmail.com')->locale('fr')->sendWithTranslatedConstructor('App/Mail/Invitation', [$user]); // first parameter is class, second paramteter is the input of the class.
 	
 	// Queue mail and translate text inside constructor
-	/iwasherefirst2/MultiMail::to($to)->from('email@gmail.com')->locale('fr')->queueWithTranslatedConstructor('App/Mail/Invitation', [$user]);
+	/iwasherefirst2/MultiMail::to($to)->from('email@gmail.com')->locale('fr')->queueWithTranslatedConstructor('App/Mail/Invitation', [$user]); // first parameter is class, second paramteter is the input of the class.
 	
