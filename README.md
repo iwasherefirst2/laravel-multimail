@@ -1,6 +1,6 @@
 # MultiMail 
 
-**MultiMail** helps you to send mails from your Laravel application from multiple email accounts. It also offers help for sending queued, translatable or bulk mails.
+**MultiMail** helps you to send mails from your Laravel application from multiple email accounts. It also offers help for sending queued, translatable or bulk mails. It also ships with a helper function for salutation in your emails.
 
 ## Requirments
 
@@ -36,7 +36,7 @@ If you want to send out queued emails please install a [queue driver](https://la
 One may send a mail using `/iwasherefirst2/MultiMail` instead of `/Mail`. The following methods are supported
 
 | Method | Desciption|
-| :----: |:------------:|
+| ---- |------------|
 | `to($receiver)` | `$receiver` should either be a email provided as a string, or an object that implements `\iwasherefirst2\Interface\Sendable` |
 | `from($sender)` | `$sender` is one of the mails provided in `config/multimail.php` |
 | `locale($locale)` | translate blade of mailable in a locale other than the current language, and will even remember this locale if the mail is queued | 
@@ -53,7 +53,7 @@ One may send a mail using `/iwasherefirst2/MultiMail` instead of `/Mail`. The fo
 	
 ### Bulk messages
 
-For bulk messages, you may first require a mailer object.
+For bulk messages, you may first require a mailer object. You can define a pause in seconds ($timeout) after a number of mails ($frequency) has been send. 
 
 	$mailer = /iwasherefirst2/MultiMail::getMailer('email@gmail.com' , $timeout, $frequency);
 	
@@ -62,13 +62,6 @@ Then you can iterate through your list. The methods of the mailer object are ide
 	foreach($users as $user){
 		$mailer->to($user)->send(new /App/Mail/Invitation($user));
 	};
-
-    /iwasherefirst2/MultiMail::from('email@gmail.com')->bulk($list, $timeout, $frequency, function($to, $mailer){ $mailer->to($to)->send(new App/Mail/Invitation($user, $form))  });
-
-### Salutation
-
-This packages comes with a mail salutation solution in English, German, Frensh, Spanish and Portuguese. It covers informal or formal and for single or two users.
-
 
 ### Translation inside Mailable Constructor
 
@@ -80,4 +73,49 @@ If text that has to be translated is generated in the constructor of the mailabl
 	
 	// Queue mail and translate text inside constructor
 	/iwasherefirst2/MultiMail::to($to)->from('email@gmail.com')->locale('fr')->queueWithTranslatedConstructor('App/Mail/Invitation', [$user]); // first parameter is class, second paramteter is the input of the class.
+	
+### Salutation Helper
+
+This packages comes with a mail informel/formal salutation helper in English, German, Frensh, Spanish and Portuguese. The object `$user` needs to implement `\iwasherefirst2\Interface\Salutable`. 
+It may be used like this in your blade:
+
+	
+    {{ salutation('formal', $user) }}
+	
+	// Output for male $user "Max Mustermann"
+	// EN: Dear Mr. Mustermann,
+	// DE: Lieber Herr Mustermann
+	// FR: Monsieur Mustermann,
+	// PT: Prezado Sr. Mustermann,
+    // ES: Estimado Señor Mustermann
+	
+	// Output for female $user "Maxi Musterfrau"
+	// EN: Dear Mrs. Musterfrau,
+	// DE: Liebe Frau Musterfrau
+	// FR: Madame Musterfrau,
+	// PT: Prezada Musterfrau,
+    // ES: Estimada Señora Musterfrau
+	
+	
+	
+	{{ salutation('informal', $user) }}
+	
+	// Output for male "Max Mustermann"
+	// EN: Dear Max,
+	// DE: Lieber Max
+	// FR: Cher Max,
+	// PT: Querido Max,
+    // ES: Querdio Max,
+	
+	// Output for female "Maxi Musterfrau"
+	// EN: Dear Maxi,
+	// DE: Liebe Maxi
+	// FR: Chère Maxi,
+	// PT: Querida Maxi,
+    // ES: Querida Maxi
+	
+If `$user` is a collection or an array of `$objects` implementing `\iwasherefirst2\Interface\Salutable`, then everyone will get his own salutation, seperated by comma. For example
+
+    // Dear Max, dear Maxi, ...
+	
 	
