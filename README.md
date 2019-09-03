@@ -29,16 +29,14 @@ Configure your email clients in `config/multimail.php`:
 				   'from' => "Alice Tagarien",
 				   ],
 				  
-If you want to send out queued emails please install a [queue driver](https://laravel.com/docs/5.8/queues#driver-prerequisites).
-
-You may install the database driver like this:
+If you want to send out queued emails please install a [queue driver](https://laravel.com/docs/5.8/queues#driver-prerequisites). For example, you may setup the database driver:
 
     php artisan queue:table
     php artisan migrate
 
 ## Usage Examples
 
-To send a mail, one has to pass to the method `to` a string `$to` of the email, or an object `$to` that implements the `Sendable` interface.
+To send a mail, one has to pass to the method `to` a string `$to` of the email, or an object `$to` that implements the `\iwasherefirst2\Interface\Sendable` interface.
 The method from receives one of the emails specified in `config/multimail.php`. The method `send` or `queue` requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) as input:
 
     // Send Mail 
