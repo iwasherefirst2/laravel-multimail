@@ -40,7 +40,7 @@ The following 3 methdos from `MultiMail` are different though:
 
 | Method | Desciption|
 | ---- |------------|
-| `from($sender)` | `$sender` is one of the mails provided in `config/multimail.php` |
+| `from($sender)` | `$sender` has to be one of the mails provided in `config/multimail.php`. This will force that the mail is actually send from the given mail provider. |
 | `send($mailable)` | Will send the message directly, requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) |
 | `queue($mailable)` | Will send the message out in queue, requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) |
 
