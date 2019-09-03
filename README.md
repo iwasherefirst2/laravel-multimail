@@ -36,7 +36,7 @@ If you want to send out queued emails please install a [queue driver](https://la
 ## Usage 
 
 One may send a mail using `/iwasherefirst2/MultiMail` instead of `/Mail`. The methods `to`, `cc`, `bcc`, `locale` are exactly the same as provided by the [mail facade](https://laravel.com/docs/5.8/mail#sending-mail).
-The following 3 methdos from `MultiMail` are different though:
+The following three methods from `MultiMail` are different though:
 
 | Method | Desciption|
 | ---- |------------|
@@ -49,7 +49,7 @@ The following 3 methdos from `MultiMail` are different though:
     // Send Mail - minimal example
     /iwasherefirst2/MultiMail::from('email@gmail.com')->send(new /App/Mail/Invitation($user, $form)); 
 
-    // Send Mail with optional parameters `to` and `locale`
+    // Send Mail with optional parameters "to" and "locale"
     /iwasherefirst2/MultiMail::to('example@example.com)->from('email@gmail.com')->locale('en')->send(new /App/Mail/Invitation($user));
 	
 	// Queue Mail 
