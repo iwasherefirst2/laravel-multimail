@@ -37,7 +37,7 @@
                 "IWasHereFirst2\\LaravelMultiMail\\MultiMailServiceProvider"
             ],
             "aliases":{
-              "MultiMail": "IWasHereFirst2\\LaravelMultiMail\\MultiMailer"
+              "MultiMail": "IWasHereFirst2\\LaravelMultiMail\\Facades\\MultiMailer"
             }
         }
     }
