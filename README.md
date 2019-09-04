@@ -8,7 +8,7 @@ In addition, its also possible to send from multiple providers/hosts (its recomm
 
 ## Requirments
 
-Laravel 5.6 or above.
+Laravel 5.6 or above. Also compatible with Laravel 6.0.
 
 ## Installation
 
