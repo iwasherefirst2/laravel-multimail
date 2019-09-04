@@ -17,7 +17,7 @@ return [
               'username' => env('first_mail_username'),
               'from'     => "Max Musterman",
             ],
-        'contact@foo.bar'  =>
+        'contact@foo.org'  =>
             [
               'pass'     => env('second_mail_password'),
               'username' => env('second_mail_username'),
