@@ -18,7 +18,7 @@ Install the package into your Laraval application with composer:
 
 Publish the config file:
 
-    php artisan vendor:publish --provider="IWasHereFirst2\MultiMail\MultiMailServiceProvider"
+    php artisan vendor:publish --provider="IWasHereFirst2\LaravelMultiMail\MultiMailServiceProvider"
 
 Configure your email clients in `config/multimail.php`:
 
@@ -53,13 +53,13 @@ The following three methods from `MultiMail` are different though:
 ### Basic Examples
 
     // Send Mail - minimal example, receiver should be specified in mailable
-    \MultiMail::from('office@example.com')->send(new /App/Mail/Invitation($user, $form));
+    \MultiMail::from('office@example.com')->send(new \App\Mail\Invitation($user, $form));
 
     // Send Mail with optional parameters 'to' and 'locale'
-    \MultiMail::to('contact@foo.org')->from('email@gmail.com')->locale('en')->send(new /App/Mail/Invitation($user));
+    \MultiMail::to('contact@foo.org')->from('email@gmail.com')->locale('en')->send(new \App\Mail\Invitation($user));
 
 	  // Queue Mail
-    \MultiMail::from('contact@foo.org')->queue(new /App/Mail/Invitation($user));
+    \MultiMail::from('contact@foo.org')->queue(new \App\Mail\Invitation($user));
 
 ### Queued Mails
 
@@ -77,7 +77,7 @@ For bulk messages, you may first require a mailer object. You can define a pause
 Then you can iterate through your list. The methods of the mailer object are identical to the methods used in the `Mail` facade like `to`,`cc` , `bcc`, `send`, `locale` etc.
 
 	foreach($users as $user){
-		$mailer->to($user)->send(new /App/Mail/Invitation($user));
+		$mailer->to($user)->send(new \App\Mail\Invitation($user));
 	};
 
 ### Mailer Customization
