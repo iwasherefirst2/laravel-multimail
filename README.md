@@ -14,7 +14,7 @@ Laravel 5.6 or above. Also compatible with Laravel 6.0.
 
 Install the package into your Laraval application with composer:
 
-    composer require iwasherefirst2/laravelmultimail
+    composer require iwasherefirst2/laravel-multimail
 
 Publish the config file:
 
