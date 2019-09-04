@@ -1,6 +1,6 @@
 <?php
 
-namespace IWasHereFirst2\MultiMail;
+namespace IWasHereFirst2\LaravelMultiMail;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -23,7 +23,7 @@ class MultiMailServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app->bind('iwasherefirst2-multimail', function() {
+        $this->app->bind('iwasherefirst2-laravelmultimail', function() {
           return new MultiMailer();
         });
 

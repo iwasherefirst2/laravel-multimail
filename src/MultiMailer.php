@@ -1,6 +1,6 @@
 <?php
 
-namespace IWasHereFirst2\MultiMail;
+namespace IWasHereFirst2\LaravelMultiMail;
 
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
@@ -13,40 +13,53 @@ class MultiMailer
   protected $mailer;
   protected $locale;
 
-
-  public function send(MailableContract $mailable, $mailer_name)
+  /**
+   * Send mail throug mail account form $mailer_name
+   * @param  MailableContract $mailable
+   * @param  [type]           $mailer_name ]
+   * @return [type]                        [description]
+   */
+  public static function send(MailableContract $mailable, $mailer_name)
   {
     // no mailer given, use default mailer
     if(empty($mailer_name)) return \Mail::send($mailable);
 
-    $this->locale = $mailable->locale;
-
     $mailer = static::getMailer($mailer_name);
-
     $mailer->send($mailable);
   }
 
-  public function queue(MailQueueContract $mailable, $mailer)
+  public static function queue(MailableContract $mailable, $mailer)
   {
     // no mailer given, use default mailer
     if(empty($mailer_name)) return \Mail::queue($mailable);
-
-    $this->locale = $mailable->locale;
-
-    SendMailJob::dispatch($mailer_name, $mailable);
+    Jobs/SendMailJob::dispatch($mailer_name, $mailable);
   }
 
   public static function getMailer($name, $timout = null, $frequency = null)
   {
-    // if from_name not given, throw exception
-    //
-    // if user& pass missing throw exception
 
+    $config = config('multimail.emails')[$name];
+    if(empty($name) or empty($config))
+    {
+      throw new \Exception("Configuration for email: " . $name . ' is missing in config/multimail.php', 1);
+
+    }
+
+    // Allow user to call custom mailer
+    if(!empty($config['function_call'])){
+      return call_user_func_array($config['function_call'], $config['function_pars']);
+    }
+
+    if(empty($config['pass']) || empty($config['username'])){
+      throw new \Exception("Username or password is empty for mail provider " . $name, 1);
+    }
+
+    $provider = (!empty($config['provider'])) ? $config['provider'] : config('multimail.provider.default');
 
     //https://stackoverflow.com/a/56965347/2311074
-    $transport = new Swift_SmtpTransport('wp10991132.mailout.server-he.de', 465, 'ssl');
-    $transport->setUsername($this->getMailUser());
-    $transport->setPassword($this->getMailPass());
+    $transport = new Swift_SmtpTransport($provider['host'], $provider['port'], $provider['encryption']);
+    $transport->setUsername($config['username']);
+    $transport->setPassword($config['pass']);
 
     $swift_mailer = new Swift_Mailer($transport);
 
@@ -58,11 +71,13 @@ class MultiMailer
     $events = app()->get('events');
     $mailer = new Mailer($view, $swift_mailer, $events);
 
-    // WIe mache ich das mit dem Package :D?
-    $mail_name = $this->alias . ' ' . __('list.' . $this->purpose , [], $lang) . ' ' . __('list.words:international', [], $lang);
+    if(!empty($config['from_mail'])){
+      $mailer->alwaysFrom($config['from_mail'], $config['from_name'] ?? null);
+    }
 
-    $mailer->alwaysFrom($this->getMailAddress(), $mail_name);
-    $mailer->alwaysReplyTo($this->getMailAddress(), $mail_name);
+    if(!empty($config['reply_to_mail'])){
+      $mailer->alwaysReplyTo($config['reply_to_mail'], $config['reply_to_name'] ?? null);
+    }
 
     return $mailer;
   }
@@ -75,7 +90,18 @@ class MultiMailer
    */
   public function to($users)
   {
-      return (new PendingMail($this))->to($users);
+      return (new PendingMail())->to($users);
+  }
+
+  /**
+   * Begin the process of mailing a mailable class instance.
+   *
+   * @param  mixed  $users
+   * @return \IWasHereFirst2\MultiMail\PendingMail
+   */
+  public function from($name)
+  {
+      return (new PendingMail())->from($name);
   }
 
   /**
@@ -86,7 +112,7 @@ class MultiMailer
    */
   public function cc($users)
   {
-      return (new PendingMail($this))->cc($users);
+      return (new PendingMail())->cc($users);
   }
 
   /**
@@ -97,7 +123,7 @@ class MultiMailer
    */
   public function bcc($users)
   {
-      return (new PendingMail($this))->bcc($users);
+      return (new PendingMail())->bcc($users);
   }
 
   /**
@@ -108,7 +134,7 @@ class MultiMailer
    */
   public function locale($locale)
   {
-      return (new PendingMail($this))->locale($locale);
+      return (new PendingMail())->locale($locale);
   }
 
 }

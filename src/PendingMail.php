@@ -1,22 +1,17 @@
 <?php
 
-namespace IWasHereFirst2\MultiMail;
+namespace IWasHereFirst2\LaravelMultiMail;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use IWasHereFirst2\LaravelMultiMail\MultiMailer;
+use Illuminate\Mail\Mailable;
 
 class PendingMail
 {
     /**
-     * The mailer instance.
+     * The string of the mailer the user wishes to send from.
      *
-     * @var \IWasHereFirst2\MultiMail\Mailer
-     */
-    protected $mailer;
-
-    /**
-     * The mailer the user wishes to send from.
-     *
-     * @var \IWasHereFirst2\MultiMail\Mailer
+     * @var string
      */
     protected $fromMailer;
 
@@ -48,16 +43,6 @@ class PendingMail
      */
     protected $bcc = [];
 
-    /**
-     * Create a new mailable mailer instance.
-     *
-     * @param  \Illuminate\Mail\Mailer  $mailer
-     * @return void
-     */
-    public function __construct(MultiMailer $mailer)
-    {
-        $this->mailer = $mailer;
-    }
 
     /**
      * Set the locale of the message.
@@ -93,9 +78,7 @@ class PendingMail
      */
     public function from($mailer)
     {
-        // get mailer
-
-        $this->from = $newMailer;
+        $this->fromMailer = $mailer;
 
         return $this;
     }
@@ -138,7 +121,7 @@ class PendingMail
             return $this->queue($mailable);
         }
 
-        return $this->mailer->send($this->fill($mailable), $this->from);
+        return MultiMailer::send($this->fill($mailable), $this->fromMailer);
     }
 
     /**
@@ -149,7 +132,7 @@ class PendingMail
      */
     public function sendNow(Mailable $mailable)
     {
-        return $this->mailer->send($this->fill($mailable), $this->from);
+        return MultiMailer::send($this->fill($mailable), $this->fromMailer);
     }
 
     /**
@@ -160,7 +143,7 @@ class PendingMail
      */
     public function queue(Mailable $mailable)
     {
-        return $this->mailer->queue($this->fill($mailable), $this->from);
+        return MultiMailer::queue($this->fill($mailable), $this->fromMailer);
     }
 
     /**

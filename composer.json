@@ -1,5 +1,5 @@
 {
-    "name": "iwasherefirst2/multimail",
+    "name": "iwasherefirst2/laravel-multimail",
     "description": "A package to send mails easily from multiple mail accounts with Laravel",
     "keywords": ["multiple providers", "laravel", "emails"],
     "license": "MIT",
@@ -19,26 +19,26 @@
     },
     "require-dev": {
         "phpunit/phpunit": "~5.7.14|~6.1|~7.0|~8.0",
-        "laravel/framework": "~5.6.0|~5.7.0|~5.8.0",
+        "laravel/framework": "~5.6.0",
     },
     "autoload": {
         "psr-4": {
-            "IWasHereFirst2\\MultiMail\\": "src/"
+            "IWasHereFirst2\\LaravelMultiMail\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "IWasHereFirst2\\MultiMail\\Tests\\": "tests/"
+            "IWasHereFirst2\\LaravelMultiMail\\Tests\\": "tests/"
       }
     },
     "minimum-stability": "stable",
     "extra": {
         "laravel": {
             "providers": [
-                "IWasHereFirst2\\MultiMail\\MultiMailServiceProvider"
+                "IWasHereFirst2\\LaravelMultiMail\\MultiMailServiceProvider"
             ],
             "aliases":{
-              "MultiMail": "IWasHereFirst2\\MultiMail\\MultiMailer"
+              "MultiMail": "IWasHereFirst2\\LaravelMultiMail\\MultiMailer"
             }
         }
     }
