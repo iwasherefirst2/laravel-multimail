@@ -37,6 +37,13 @@ class MultiMailer
 
   public static function getMailer($name, $timout = null, $frequency = null)
   {
+    if(is_array($name)){
+      $from_name = $name['name'] ?? null;
+
+      if(empty($name['email'])) throw new \Exception("Mailer name has to be provided in array as column 'email' ", 1);
+      $name = $name['email'];
+    }
+
 
     $config = config('multimail.emails')[$name];
     if(empty($name) or empty($config))
@@ -71,7 +78,10 @@ class MultiMailer
     $events = app()->get('events');
     $mailer = new Mailer($view, $swift_mailer, $events);
 
-    if(!empty($config['from_mail'])){
+    if(!empty($from_name)){
+      $mailer->alwaysFrom($config['from_mail'] ?? $name, $from_name);
+    }
+    elseif(!empty($config['from_mail'])){
       $mailer->alwaysFrom($config['from_mail'], $config['from_name'] ?? null);
     }
 

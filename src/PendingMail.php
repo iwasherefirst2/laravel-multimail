@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailable;
 class PendingMail
 {
     /**
-     * The string of the mailer the user wishes to send from.
+     * The string of the mailer the user wishes to send from, or an array ['name' => .., 'email' => ..., 'reply_to']
      *
      * @var string
      */
