@@ -46,9 +46,11 @@ The following three methods from `MultiMail` are different though:
 
 | Method | Desciption|
 | ---- |------------|
-| `from($sender)` | `$sender` has to be one of the mails provided in `config/multimail.php` |
+| `from($sender)` | `$sender` has to be a string* of an email provided in `config/multimail.php`.|
 | `send($mailable)` | Will send the message through the mail account provided by `from`, requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) |
 | `queue($mailable)` | Will queue the message from the mail account provided by `from`, requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) |
+
+>*One may instead input an array of the form `['name' => Max, 'email' => 'office@example.com']`, which will overwrite the `from` setting in `multimail.config`.
 
 ### Basic Examples
 
