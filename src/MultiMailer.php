@@ -44,21 +44,18 @@ class MultiMailer
       $name = $name['email'];
     }
 
-
     $config = config('multimail.emails')[$name];
-    if(empty($name) or empty($config))
+    if(empty($name) || empty($config) || empty($config['pass']) || empty($config['username']))
     {
-      throw new \Exception("Configuration for email: " . $name . ' is missing in config/multimail.php', 1);
+      $config = config('multimail.emails.default');
+
+      if(empty($config) || empty($config['pass']) || empty($config['username'])) throw new \Exception("Configuration for email: " . $name . ' is missing in config/multimail.php and no default is specified.', 1);
 
     }
 
     // Allow user to call custom mailer
     if(!empty($config['function_call'])){
       return call_user_func_array($config['function_call'], $config['function_pars']);
-    }
-
-    if(empty($config['pass']) || empty($config['username'])){
-      throw new \Exception("Username or password is empty for mail provider " . $name, 1);
     }
 
     $provider = (!empty($config['provider'])) ? $config['provider'] : config('multimail.provider.default');

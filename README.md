@@ -70,6 +70,35 @@ i.e. they are either send explicitly be the `queue` method or the mailable class
 
 It is of course necessary to install a [queue driver](https://laravel.com/docs/5.8/queues#driver-prerequisites).
 
+
+### Default mails
+
+It is recommended to **avoid** putting your actual mail credentials into your local `.env` to prevent sending testing mails to actual users.
+Instead of adding fake entries in your `.env` file for any mail provided in `config/multimail.php`, simply use a fallback mail that should
+be used whenever the username/password cannot be found in the `.env` file. To do so, add a `default` entry inside the `email` array from `config/multimail.php`:
+
+    'emails'  => [
+        'office@example.net' =>
+            [
+              'pass'     => env('first_mail_password'),
+              'username' => env('first_mail_username'),
+              'from'     => "Max Musterman",
+            ],
+        'contact@example.net'  =>
+            [
+              'pass'     => env('second_mail_password'),
+              'username' => env('second_mail_username'),
+              'from'     => "Alice Armania",
+            ],
+        'default' =>
+          [
+            'pass'            => env('MAIL_PASSWORD'),
+            'username'        => env('MAIL_USERNAME'),
+          ]
+    ],
+
+
+
 ### Bulk messages
 
 For bulk messages, you may first require a mailer object. You can define a pause in seconds ($timeout) after a number of mails ($frequency) has been send.
