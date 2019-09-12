@@ -50,7 +50,7 @@ class MultiMailer
       if(empty($key['email'])) throw new \Exception("Mailer name has to be provided in array as column 'email' ", 1);
       $email = $key['email'];
     }else{
-      $email = $key['email'];
+      $email = $key;
     }
 
     $config = config('multimail.emails')[$email];
