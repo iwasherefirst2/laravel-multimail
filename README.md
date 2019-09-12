@@ -25,15 +25,15 @@ Configure your email clients in `config/multimail.php`:
     'emails'  => [
         'office@example.net' =>
             [
-              'pass'     => env('first_mail_password'),
-              'username' => env('first_mail_username'),
-              'from'     => "Max Musterman",
+              'pass'          => env('first_mail_password'),
+              'username'      => env('first_mail_username'),
+              'from_name'     => "Max Musterman",
             ],
         'contact@example.net'  =>
             [
-              'pass'     => env('second_mail_password'),
-              'username' => env('second_mail_username'),
-              'from'     => "Alice Armania",
+              'pass'          => env('second_mail_password'),
+              'username'      => env('second_mail_username'),
+              'from_name'     => "Alice Armania",
             ],
     ],
 
@@ -80,15 +80,15 @@ be used whenever the username/password cannot be found in the `.env` file. To do
     'emails'  => [
         'office@example.net' =>
             [
-              'pass'     => env('first_mail_password'),
-              'username' => env('first_mail_username'),
-              'from'     => "Max Musterman",
+              'pass'          => env('first_mail_password'),
+              'username'      => env('first_mail_username'),
+              'from_name'     => "Max Musterman",
             ],
         'contact@example.net'  =>
             [
-              'pass'     => env('second_mail_password'),
-              'username' => env('second_mail_username'),
-              'from'     => "Alice Armania",
+              'pass'          => env('second_mail_password'),
+              'username'      => env('second_mail_username'),
+              'from_name'     => "Alice Armania",
             ],
         'default' =>
           [
@@ -125,17 +125,17 @@ If you wish to send from mails with different hosts, then create another provide
     'emails'  => [
         'office@example.net' =>
             [
-              'pass'     => env('first_mail_password'),
-              'username' => env('first_mail_username'),
-              'from'     => "Max Musterman",   
+              'pass'      => env('first_mail_password'),
+              'username'  => env('first_mail_username'),
+              'from_name' => "Max Musterman",   
                                                         // <------ no provider given because 'default' provider is used
             ],
         'contact@other_domain.net'  =>
             [
-              'pass'     => env('second_mail_password'),
-              'username' => env('second_mail_username'),
-              'from'     => "Alice Armania",
-              'provider' => 'new_provider',            // <------ specify new provider here
+              'pass'      => env('second_mail_password'),
+              'username'  => env('second_mail_username'),
+              'from_name' => "Alice Armania",
+              'provider'  => 'new_provider',            // <------ specify new provider here
             ],
     ],
 

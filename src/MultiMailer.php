@@ -25,7 +25,7 @@ class MultiMailer
     if(empty($mailer_name)) return \Mail::send($mailable);
 
     $mailer = static::getMailer($mailer_name);
-    $mailer->send($mailable);
+    $mailable->send($mailer);
   }
 
   public static function queue(MailableContract $mailable, $mailer)
@@ -35,27 +35,31 @@ class MultiMailer
     Jobs/SendMailJob::dispatch($mailer_name, $mailable);
   }
 
-  public static function getMailer($name, $timout = null, $frequency = null)
+  /**
+   * Create mailer from config/multimail.php
+   * @param  mixed $name  string or array
+   * @param  int timeout
+   * @param  int frequency
+   * @return \Illuminate\Mail\Mailer
+   */
+  public static function getMailer($key, $timout = null, $frequency = null)
   {
-    if(is_array($name)){
-      $from_name = $name['name'] ?? null;
+    if(is_array($key)){
+      $from_name = $key['name'] ?? null;
 
-      if(empty($name['email'])) throw new \Exception("Mailer name has to be provided in array as column 'email' ", 1);
-      $name = $name['email'];
+      if(empty($key['email'])) throw new \Exception("Mailer name has to be provided in array as column 'email' ", 1);
+      $email = $key['email'];
+    }else{
+      $email = $key['email'];
     }
 
-    $config = config('multimail.emails')[$name];
-    if(empty($name) || empty($config) || empty($config['pass']) || empty($config['username']))
+    $config = config('multimail.emails')[$email];
+    if(empty($email) || empty($config) || empty($config['pass']) || empty($config['username']))
     {
       $config = config('multimail.emails.default');
 
-      if(empty($config) || empty($config['pass']) || empty($config['username'])) throw new \Exception("Configuration for email: " . $name . ' is missing in config/multimail.php and no default is specified.', 1);
-
-    }
-
-    // Allow user to call custom mailer
-    if(!empty($config['function_call'])){
-      return call_user_func_array($config['function_call'], $config['function_pars']);
+      if(empty($config) || empty($config['pass']) || empty($config['username']))
+        throw new \Exception("Configuration for email: " . $email . ' is missing in config/multimail.php and no default is specified.', 1);
     }
 
     $provider = (!empty($config['provider'])) ? $config['provider'] : config('multimail.provider.default');
@@ -75,12 +79,11 @@ class MultiMailer
     $events = app()->get('events');
     $mailer = new Mailer($view, $swift_mailer, $events);
 
-    if(!empty($from_name)){
-      $mailer->alwaysFrom($config['from_mail'] ?? $name, $from_name);
+    if(empty($from_name) && !empty($config['from_name'])){
+      $from_name = $config['from_name'];
     }
-    elseif(!empty($config['from_mail'])){
-      $mailer->alwaysFrom($config['from_mail'], $config['from_name'] ?? null);
-    }
+
+    $mailer->alwaysFrom($config['from_mail'] ?? $email, $from_name ?? null);
 
     if(!empty($config['reply_to_mail'])){
       $mailer->alwaysReplyTo($config['reply_to_mail'], $config['reply_to_name'] ?? null);
