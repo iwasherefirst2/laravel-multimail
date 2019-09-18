@@ -1,10 +1,10 @@
 # Laravel-MultiMail
 
-This lightweight package helps you to send mails from your Laravel application from multiple email accounts, e.g. `office@domain.com`, `contact@domain.com`, `do-not-reply@domain.com`.
-
+This lightweight package helps you to send mails from your Laravel application from multiple email accounts and multipe providers, e.g. 
+`office@domain.com`, `contact@domain.com`, `do-not-reply@domain.com` or `info@test.net`.
 It supports sending queued, localized and bulk mails.
 
-In addition, its also possible to send from multiple providers/hosts (its recommended to send bulk and billing mails from different mail servers).
+This package works for `SMTP` and `log` drivers.
 
 ## Requirments
 
@@ -25,15 +25,15 @@ Configure your email clients in `config/multimail.php`:
     'emails'  => [
         'office@example.net' =>
             [
-              'pass'          => env('first_mail_password'),
-              'username'      => env('first_mail_username'),
-              'from_name'     => "Max Musterman",
+              'pass'     => env('first_mail_password'),
+              'username' => env('first_mail_username'),
+              'from'     => "Max Musterman",
             ],
         'contact@example.net'  =>
             [
-              'pass'          => env('second_mail_password'),
-              'username'      => env('second_mail_username'),
-              'from_name'     => "Alice Armania",
+              'pass'     => env('second_mail_password'),
+              'username' => env('second_mail_username'),
+              'from'     => "Alice Armania",
             ],
     ],
 
@@ -42,15 +42,7 @@ Make sure to put your credentials in the `.env` file, so they don't get tracked 
 ## Usage
 
 One may send a mail using `\MultiMail` instead of `\Mail`. The methods `to`, `cc`, `bcc`, `locale` are exactly the same as provided by the [mail facade](https://laravel.com/docs/5.8/mail#sending-mail).
-The following three methods from `MultiMail` are different though:
-
-| Method | Desciption|
-| ---- |------------|
-| `from($sender)` | `$sender` has to be a string* of an email provided in `config/multimail.php`.|
-| `send($mailable)` | Will send the message through the mail account provided by `from`, requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) |
-| `queue($mailable)` | Will queue the message from the mail account provided by `from`, requires a [mailable](https://laravel.com/docs/5.8/mail#generating-mailables) |
-
->*One may instead input an array of the form `['name' => Max, 'email' => 'office@example.com']`, which will overwrite the `from` setting in `multimail.config`.
+The `from` method from `MultiMail` needs a string of an email provided in `config/multimail.php`. When using `send` or `queue` the mail will be send from the mail account specified in `cofing/multimail.php`.
 
 ### Basic Examples
 
@@ -60,14 +52,13 @@ The following three methods from `MultiMail` are different though:
     // Send Mail with optional parameters 'to' and 'locale'
     \MultiMail::to('contact@foo.org')->from('email@gmail.com')->locale('en')->send(new \App\Mail\Invitation($user));
 
-	  // Queue Mail
+    // Queue Mail
     \MultiMail::from('contact@foo.org')->queue(new \App\Mail\Invitation($user));
 
 ### Queued Mails
 
 Queued mails work exactly the same as for the normal [Mail](https://laravel.com/docs/5.8/mail#queueing-mail) facade,
 i.e. they are either send explicitly be the `queue` method or the mailable class implements the `ShouldQueue` contract.
-
 It is of course necessary to install a [queue driver](https://laravel.com/docs/5.8/queues#driver-prerequisites).
 
 
@@ -80,15 +71,15 @@ be used whenever the username/password cannot be found in the `.env` file. To do
     'emails'  => [
         'office@example.net' =>
             [
-              'pass'          => env('first_mail_password'),
-              'username'      => env('first_mail_username'),
-              'from_name'     => "Max Musterman",
+              'pass'     => env('first_mail_password'),
+              'username' => env('first_mail_username'),
+              'from'     => "Max Musterman",
             ],
         'contact@example.net'  =>
             [
-              'pass'          => env('second_mail_password'),
-              'username'      => env('second_mail_username'),
-              'from_name'     => "Alice Armania",
+              'pass'     => env('second_mail_password'),
+              'username' => env('second_mail_username'),
+              'from'     => "Alice Armania",
             ],
         'default' =>
           [
@@ -99,25 +90,7 @@ be used whenever the username/password cannot be found in the `.env` file. To do
 
 
 
-### Bulk messages
-
-For bulk messages, you may first require a mailer object. You can define a pause in seconds ($timeout) after a number of mails ($frequency) has been send.
-
-	$mailer = \MultiMail::getMailer('office@example.com' , $timeout, $frequency);
-
-Then you can iterate through your list. The methods of the mailer object are identical to the methods used in the `Mail` facade like `to`,`cc` , `bcc`, `send`, `locale` etc.
-
-	foreach($users as $user){
-		$mailer->to($user)->send(new \App\Mail\Invitation($user));
-	};
-
-### Mailer Customization
-
-If you wish to add more SwiftMailer methods to your mailer, you can get the mailer object through
-
-    $mailer = \MultiMail::getMailer('office@example.com');
-
-### Multiple Mail Providers
+### Multiple Mail Providers & Drivers
 
 If you wish to send from mails with different hosts, then create another provider in the `provider` array and reference it inside the `emails` array:
 
@@ -125,26 +98,27 @@ If you wish to send from mails with different hosts, then create another provide
     'emails'  => [
         'office@example.net' =>
             [
-              'pass'      => env('first_mail_password'),
-              'username'  => env('first_mail_username'),
-              'from_name' => "Max Musterman",   
+              'pass'     => env('first_mail_password'),
+              'username' => env('first_mail_username'),
+              'from'     => "Max Musterman",   
                                                         // <------ no provider given because 'default' provider is used
             ],
         'contact@other_domain.net'  =>
             [
-              'pass'      => env('second_mail_password'),
-              'username'  => env('second_mail_username'),
-              'from_name' => "Alice Armania",
-              'provider'  => 'new_provider',            // <------ specify new provider here
+              'pass'     => env('second_mail_password'),
+              'username' => env('second_mail_username'),
+              'from'     => "Alice Armania",
+              'provider' => 'new_provider',            // <------ specify new provider here
             ],
     ],
 
     'provider' => [
       'default' =>
         [
-          'host'      => env('MAIL_HOST'),
-          'port'      => env('MAIL_PORT'),
+          'host'       => env('MAIL_HOST'),
+          'port'       => env('MAIL_PORT'),
           'encryption' => env('MAIL_ENCRYPTION'),
+          'driver'     => env('MAIL_DRIVER'), 
         ],
       'new_provider' =>
         [
@@ -153,3 +127,15 @@ If you wish to send from mails with different hosts, then create another provide
           'encryption' => env('MAIL_ENCRYPTION_PROVIDER_B'),
         ]'
     ],
+
+
+### Bulk messages
+
+For bulk messages, you may first require a mailer object. You can define a pause in seconds ($timeout) after a number of mails ($frequency) has been send.
+
+	$mailer = \MultiMail::getMailer('office@example.com' , $timeout, $frequency);
+
+Then you can iterate through your list. 
+	foreach($users as $user){
+		$mailer->send(new \App\Mail\Invitation($user));
+	};

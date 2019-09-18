@@ -7,6 +7,9 @@ use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
 use Swift_SmtpTransport;
 use Swift_Mailer;
 use \Illuminate\Mail\Mailer;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Transport\LogTransport;
+use Psr\Log\LoggerInterface;
 
 class MultiMailer
 {
@@ -19,7 +22,7 @@ class MultiMailer
    * @param  [type]           $mailer_name ]
    * @return [type]                        [description]
    */
-  public static function send(MailableContract $mailable, $mailer_name)
+  public static function sendMail(MailableContract $mailable, $mailer_name)
   {
     // no mailer given, use default mailer
     if(empty($mailer_name)) return \Mail::send($mailable);
@@ -28,11 +31,64 @@ class MultiMailer
     $mailable->send($mailer);
   }
 
-  public static function queue(MailableContract $mailable, $mailer)
+  public static function queueMail(MailableContract $mailable, $mailer)
   {
     // no mailer given, use default mailer
     if(empty($mailer_name)) return \Mail::queue($mailable);
     Jobs/SendMailJob::dispatch($mailer_name, $mailable);
+  }
+
+  /**
+   * Get SMTP Transport
+   * @param  array
+   * @return Swift_SmtpTransport
+   */
+  protected static function getSMTPTransport($config)
+  {
+    $provider = (!empty($config['provider'])) ? $config['provider'] : config('multimail.provider.default');
+
+    $transport = new Swift_SmtpTransport($provider['host'], $provider['port'], $provider['encryption']);
+    $transport->setUsername($config['username']);
+    $transport->setPassword($config['pass']);
+
+    return $transport;
+  }
+
+  /**
+   * Get LOG Transport
+   * @return LogTransport
+   */
+  protected static function getLogTransport()
+  {
+    return new LogTransport( app()->make(LoggerInterface::class));
+  }
+
+  /**
+   * Create SwiftMailer with timeout/frequency. Timeout/frequency is ignored
+   * when Log Driver is used.
+   *
+   * @param  array
+   * @return Swift_Mailer
+   */
+  protected static function getSwiftMailer($config, $timeout = null, $frequency = null)
+  {
+    $provider = (!empty($config['provider'])) ? $config['provider'] : config('multimail.provider.default');
+
+    if(isset($provider['driver']) && $provider['driver'] == 'log'){
+      $transport = static::getLogTransport();
+
+      return new Swift_Mailer($transport);
+    }
+
+    $transport = static::getSMTPTransport($config);
+
+    $swift_mailer = new Swift_Mailer($transport);
+
+    if(!empty($frequency) && !empty($timeout)){
+        $swift_mailer->registerPlugin(new \Swift_Plugins_AntiFloodPlugin($frequency, $timeout));
+    }
+
+    return $swift_mailer;
   }
 
   /**
@@ -42,7 +98,7 @@ class MultiMailer
    * @param  int frequency
    * @return \Illuminate\Mail\Mailer
    */
-  public static function getMailer($key, $timout = null, $frequency = null)
+  public static function getMailer($key, $timeout = null, $frequency = null)
   {
     if(is_array($key)){
       $from_name = $key['name'] ?? null;
@@ -62,18 +118,8 @@ class MultiMailer
         throw new \Exception("Configuration for email: " . $email . ' is missing in config/multimail.php and no default is specified.', 1);
     }
 
-    $provider = (!empty($config['provider'])) ? $config['provider'] : config('multimail.provider.default');
+    $swift_mailer = static::getSwiftMailer($config, $timeout = null, $frequency = null);
 
-    //https://stackoverflow.com/a/56965347/2311074
-    $transport = new Swift_SmtpTransport($provider['host'], $provider['port'], $provider['encryption']);
-    $transport->setUsername($config['username']);
-    $transport->setPassword($config['pass']);
-
-    $swift_mailer = new Swift_Mailer($transport);
-
-    if(!empty($mails) && !empty($minutes)){
-      $swift_mailer->registerPlugin(new \Swift_Plugins_AntiFloodPlugin($mails, $minutes));
-    }
 
     $view = app()->get('view');
     $events = app()->get('events');
@@ -145,6 +191,28 @@ class MultiMailer
   public function locale($locale)
   {
       return (new PendingMail())->locale($locale);
+  }
+
+  /**
+   * Send mail or queue if implements ShouldQueue
+   *
+   * @param  Mailable
+   * @return \IWasHereFirst2\MultiMail\MultiMailer
+   */
+  public function send(Mailable $mailable)
+  {
+      return (new PendingMail())->send($locale);
+  }
+
+  /**
+   * Queue mail
+   *
+  * @param  Mailable
+   * @return \IWasHereFirst2\MultiMail\MultiMailer
+   */
+  public function queue(Mailable $mailable)
+  {
+      return (new PendingMail())->queue($mailable);
   }
 
 }

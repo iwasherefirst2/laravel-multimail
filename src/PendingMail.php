@@ -121,7 +121,7 @@ class PendingMail
             return $this->queue($mailable);
         }
 
-        return MultiMailer::send($this->fill($mailable), $this->fromMailer);
+        return $this->sendNow($this->fill($mailable));
     }
 
     /**
@@ -132,7 +132,9 @@ class PendingMail
      */
     public function sendNow(Mailable $mailable)
     {
-        return MultiMailer::send($this->fill($mailable), $this->fromMailer);
+        $mailer = $this->fromMailer ?? optional($mailable)->fromMailer;
+
+        return MultiMailer::sendMail($this->fill($mailable), $mailer);
     }
 
     /**
@@ -143,7 +145,9 @@ class PendingMail
      */
     public function queue(Mailable $mailable)
     {
-        return MultiMailer::queue($this->fill($mailable), $this->fromMailer);
+        $mailer = $this->fromMailer ?? optional($mailable)->fromMailer;
+
+        return MultiMailer::queueMail($this->fill($mailable), $mailer);
     }
 
     /**
@@ -163,7 +167,7 @@ class PendingMail
      * @param  \Illuminate\Mail\Mailable  $mailable
      * @return mixed
      */
-    public function queueWithTranslatedConstructor(Mailable $mailable)
+    public function queueWithTranslatedConstructor($classname, $parameter)
     {
       return $this->queue($this->createMailable($classname, $parameter));
     }
@@ -195,9 +199,10 @@ class PendingMail
      */
     protected function fill(Mailable $mailable)
     {
+        if(!empty($this->locale)) $mailable->locale($this->locale);
+
         return $mailable->to($this->to)
                         ->cc($this->cc)
-                        ->bcc($this->bcc)
-                        ->locale($this->locale);
+                        ->bcc($this->bcc);
     }
 }
