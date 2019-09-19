@@ -4,6 +4,7 @@ namespace IWasHereFirst2\LaravelMultiMail;
 
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
+use IWasHereFirst2\LaravelMultiMail\Jobs\SendMailJob;
 use Swift_SmtpTransport;
 use Swift_Mailer;
 use \Illuminate\Mail\Mailer;
@@ -31,11 +32,11 @@ class MultiMailer
     $mailable->send($mailer);
   }
 
-  public static function queueMail(MailableContract $mailable, $mailer)
+  public static function queueMail(MailableContract $mailable, $mailer_name)
   {
     // no mailer given, use default mailer
     if(empty($mailer_name)) return \Mail::queue($mailable);
-    Jobs/SendMailJob::dispatch($mailer_name, $mailable);
+    SendMailJob::dispatch($mailer_name, $mailable);
   }
 
   /**
