@@ -47,24 +47,27 @@ The `from` method from `MultiMail` needs a string of an email provided in `confi
 
 ### Basic Examples
 
-    // Send Mail - minimal example, receiver should be specified in mailable
+This example assumes that `office@example.net` and `contact@example.net` have been specified in `config/multimail.php`.
+
+    // Send Mail - send mail from office@example.net, receiver should be specified in mailable
     \MultiMail::from('office@example.com')->send(new \App\Mail\Invitation($user, $form));
 
-    // Send Mail with optional parameters 'to' and 'locale'
-    \MultiMail::to('contact@foo.org')->from('email@gmail.com')->locale('en')->send(new \App\Mail\Invitation($user));
-
-    // Queue Mail
-    \MultiMail::from('contact@foo.org')->queue(new \App\Mail\Invitation($user));
+    // Send Mail with optional parameters 'to' and 'locale' from malaccount email@gmail.com
+    \MultiMail::to('contact@foo.org')->from('email@example.net')->locale('en')->send(new \App\Mail\Invitation($user));
 
 ### Queued Mails
 
 Queued mails work exactly the same as for the normal [Mail](https://laravel.com/docs/5.8/mail#queueing-mail) facade,
 i.e. they are either send explicitly be the `queue` method or the mailable class implements the `ShouldQueue` contract.
+
+    // Queue Mail
+    \MultiMail::from('contact@foo.org')->queue(new \App\Mail\Invitation($user));
+
 It is of course necessary to install a [queue driver](https://laravel.com/docs/5.8/queues#driver-prerequisites).
 
 ### Multiple Mail Providers & Drivers
 
-If you wish to send from mails with different provider, then create another provider in the `provider` array and reference it inside the `emails` array:
+If you wish to send from mails with different provider, then you may create another provider in the `provider` array and reference it inside the `emails` array:
 
 
     'emails'  => [
@@ -97,6 +100,7 @@ If you wish to send from mails with different provider, then create another prov
           'host'      => env('MAIL_HOST_PROVIDER_B'),
           'port'      => env('MAIL_PORT_PROVIDER_B'),
           'encryption' => env('MAIL_ENCRYPTION_PROVIDER_B'),
+	  'driver'     => env('MAIL_DRIVER_B'), 
         ]'
     ],
 
@@ -108,12 +112,13 @@ For bulk messages, you may first require a mailer object. You can define a pause
 	$mailer = \MultiMail::getMailer('office@example.com' , $timeout, $frequency);
 
 Then you can iterate through your list. 
-	foreach($users as $user){
-		$mailer->send(new \App\Mail\Invitation($user));
-	};
+
+    foreach($users as $user){
+	$mailer->send(new \App\Mail\Invitation($user));
+    };
 
 
-### Default mails
+### Default mailaccount
 
 You may provide `default` credentials inside the `email` array from `config/multimail.php`:
 
@@ -141,6 +146,13 @@ When `first_mail_password` and `first_mail_username` are empty, `office@example.
 
 ### Advice
 
-It is recommended to **avoid** putting your actual mail credentials into your local `.env` to prevent sending testing mails to actual users.
+#### Production environment
 
-It is recommeded to use a log driver when doing phpunit tests.
+In your production environment simply provide all credentials into your local `.env` file.
+
+#### Local environment
+
+Do not specify any email acounts in your local `.env`. Otherwise you may risk to send testing mails to actual users.
+Instead use `log` driver or setup a fake mail SMTP account like [mailtrap](https://mailtrap.io/) or similar services.
+
+If you want to use a fake mail SMPT account for testing, it is not needed to specifiy the same credentials for any email account. Instead, simply provide a default mail account (see above `Default mailaccount`).
