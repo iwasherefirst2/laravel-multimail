@@ -65,6 +65,38 @@ i.e. they are either send explicitly be the `queue` method or the mailable class
 
 It is of course necessary to install a [queue driver](https://laravel.com/docs/5.8/queues#driver-prerequisites).
 
+### Specify everything in mailable
+
+You may set `to`, `cc`, `bcc`, `locale` and `from`  in your mailable class. In this case, you could reduce the basic example from above to:
+
+    // Send mail from office@example.net
+    \MultiMail::send(new \App\Mail\Invitation($user));
+
+Mailable:
+
+    /**
+     * Create a new message instance.
+     *
+     * @return void
+     */
+    public function __construct($user)
+    {
+      $this->to  = $user;
+      $this->fromMailer = 'office@example.com'
+      $this->locale('en');
+    }
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        return $this->markdown('emails.invitation')
+                    ->subject('Invitation mail')
+    }
+
 ### Multiple Mail Providers & Drivers
 
 If you wish to send from mails with different provider, then you may create another provider in the `provider` array and reference it inside the `emails` array:
@@ -143,38 +175,6 @@ You may provide `default` credentials inside the `email` array from `config/mult
     ],
 
 When `first_mail_password` and `first_mail_username` are empty, `office@example.net` will use credentials specified by `default`. This is useful for your local development, when you want to send all mains from one mailaccount while testing.
-
-#### Specify everything in mailable
-
-You may set `to`, `cc`, `bcc`, `locale` and `from`  in your mailable class. In this case, you could reduce the basic example from above to:
-
-    // Send mail from office@example.net
-    \MultiMail::send(new \App\Mail\Invitation($user));
-
-Mailable:
-
-    /**
-     * Create a new message instance.
-     *
-     * @return void
-     */
-    public function __construct($user)
-    {
-      $this->to  = $user;
-      $this->fromMailer = 'office@example.com'
-      $this->locale('en');
-    }
-
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build()
-    {
-        return $this->markdown('emails.invitation')
-                    ->subject('Invitation mail')
-    }
 
 ### Advice
 
