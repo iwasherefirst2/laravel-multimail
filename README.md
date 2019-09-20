@@ -49,11 +49,11 @@ The `from` method from `MultiMail` needs a string of an email provided in `confi
 
 This example assumes that `office@example.net` and `contact@example.net` have been specified in `config/multimail.php`.
 
-    // Send Mail - send mail from office@example.net, receiver should be specified in mailable
-    \MultiMail::from('office@example.com')->send(new \App\Mail\Invitation($user, $form));
+    // Send mail from office@example.net
+    \MultiMail::to($user)->from('office@example.com')->send(new \App\Mail\Invitation($user));
 
-    // Send Mail with optional parameters 'to' and 'locale' from malaccount email@gmail.com
-    \MultiMail::to('contact@foo.org')->from('email@example.net')->locale('en')->send(new \App\Mail\Invitation($user));
+    // Send from malaccount email@gmail.com
+    \MultiMail::to($user)->from('email@example.net')->locale('en')->send(new \App\Mail\Invitation($user));
 
 ### Queued Mails
 
@@ -144,6 +144,38 @@ You may provide `default` credentials inside the `email` array from `config/mult
 
 When `first_mail_password` and `first_mail_username` are empty, `office@example.net` will use credentials specified by `default`. This is useful for your local development, when you want to send all mains from one mailaccount while testing.
 
+#### Specify everything in mailable
+
+You may set `to`, `cc`, `bcc`, `locale` and `from`  in your mailable class. In this case, you could reduce the basic example from above to:
+
+    // Send mail from office@example.net
+    \MultiMail::send(new \App\Mail\Invitation($user));
+
+Mailable:
+
+    /**
+     * Create a new message instance.
+     *
+     * @return void
+     */
+    public function __construct($user)
+    {
+      $this->to  = $user;
+      $this->fromMailer = 'office@example.com'
+      $this->locale('en');
+    }
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        return $this->markdown('emails.invitation')
+                    ->subject('Invitation mail')
+    }
+
 ### Advice
 
 #### Production environment
@@ -156,3 +188,4 @@ Do not specify any email acounts in your local `.env`. Otherwise you may risk to
 Instead use `log` driver or setup a fake mail SMTP account like [mailtrap](https://mailtrap.io/) or similar services.
 
 If you want to use a fake mail SMPT account for testing, it is not needed to specifiy the same credentials for any email account. Instead, simply provide a default mail account (see above `Default mailaccount`).
+
