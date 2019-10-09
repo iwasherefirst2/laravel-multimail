@@ -3,7 +3,6 @@
 namespace IWasHereFirst2\LaravelMultiMail;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
-use IWasHereFirst2\LaravelMultiMail\MultiMailer;
 use Illuminate\Mail\Mailable;
 
 class PendingMail
@@ -42,7 +41,6 @@ class PendingMail
      * @var array
      */
     protected $bcc = [];
-
 
     /**
      * Set the locale of the message.
@@ -151,47 +149,6 @@ class PendingMail
     }
 
     /**
-     * Send a new mailable message instance.
-     *
-     * @param  \Illuminate\Mail\Mailable  $mailable
-     * @return mixed
-     */
-    public function sendWithTranslatedConstructor($classname, $parameter)
-    {
-        return $this->send($this->createMailable($classname, $parameter));
-    }
-
-    /**
-     * Push the given mailable onto the queue.
-     *
-     * @param  \Illuminate\Mail\Mailable  $mailable
-     * @return mixed
-     */
-    public function queueWithTranslatedConstructor($classname, $parameter)
-    {
-      return $this->queue($this->createMailable($classname, $parameter));
-    }
-
-    /**
-     * Create mailable by classname and parameter
-     * @param  [type] $classname [description]
-     * @param  [type] $parameter [description]
-     * @return [type]            [description]
-     */
-    public function createMailable($classname, $parameter)
-    {
-      $temp = \App::getLocale();
-      \App::setLocale($this->locale);
-
-      $reflection_class = new \ReflectionClass($classname);
-      $mailable         = $reflection_class->newInstanceArgs($parameter);
-
-      \App::setLocale($temp);
-
-      return $mailable;
-    }
-
-    /**
      * Populate the mailable with the addresses.
      *
      * @param  \Illuminate\Mail\Mailable  $mailable
@@ -199,7 +156,9 @@ class PendingMail
      */
     protected function fill(Mailable $mailable)
     {
-        if(!empty($this->locale)) $mailable->locale($this->locale);
+        if (!empty($this->locale)) {
+            $mailable->locale($this->locale);
+        }
 
         return $mailable->to($this->to)
                         ->cc($this->cc)

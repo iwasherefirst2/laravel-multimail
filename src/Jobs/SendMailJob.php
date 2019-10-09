@@ -3,10 +3,10 @@
 namespace IWasHereFirst2\LaravelMultiMail\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use IWasHereFirst2\LaravelMultiMail\MultiMailer;
 
 class SendMailJob implements ShouldQueue
@@ -14,6 +14,7 @@ class SendMailJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $mailer_name;
+
     protected $mailable;
 
     /**
@@ -34,6 +35,6 @@ class SendMailJob implements ShouldQueue
      */
     public function handle()
     {
-      MultiMailer::send($this->mailer_name, $this->mailable);
+        MultiMailer::sendMail($this->mailable, $this->mailer_name);
     }
 }

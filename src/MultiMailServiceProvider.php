@@ -13,7 +13,6 @@ class MultiMailServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
     }
 
     /**
@@ -23,12 +22,12 @@ class MultiMailServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app->bind('iwasherefirst2-laravelmultimail', function() {
-          return new MultiMailer();
+        $this->app->bind('iwasherefirst2-laravelmultimail', function () {
+            return new MultiMailer();
         });
 
         $this->publishes([
-        dirname(__DIR__) . '/publishable/config/multimail.php' => config_path('multimail.php'),
+            dirname(__DIR__) . '/publishable/config/multimail.php' => config_path('multimail.php'),
         ]);
     }
 }

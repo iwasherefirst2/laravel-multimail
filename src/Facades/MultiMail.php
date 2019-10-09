@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Facade;
 
 class MultiMail extends Facade
 {
-  protected static function getFacadeAccessor()
-  {
-    return 'iwasherefirst2-laravelmultimail';
-  }
+    protected static function getFacadeAccessor()
+    {
+        return 'iwasherefirst2-laravelmultimail';
+    }
 }
