@@ -153,7 +153,7 @@ class MultiMailer
      */
     public function send(Mailable $mailable)
     {
-        return (new PendingMail())->send($locale);
+        return (new PendingMail())->send($mailable);
     }
 
     /**
