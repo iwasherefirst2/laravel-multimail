@@ -62,11 +62,15 @@ class MultiMailer
             $email = $key;
         }
 
-        $config = config('multimail.emails')[$email];
+        $config   = config('multimail.emails')[$email];
+
         if (empty($email) || empty($config) || empty($config['pass']) || empty($config['username'])) {
             $config = config('multimail.emails.default');
 
-            if (empty($config) || empty($config['pass']) || empty($config['username'])) {
+            $provider = static::getProvider($config['provider'] ?? null);
+
+            if ($provider['driver'] != 'log' && (empty($config) || empty($config['pass']) || empty($config['username']))) {
+                // No need for pass/username when using log-driver
                 throw new \Exception('Configuration for email: ' . $email . ' is missing in config/multimail.php and no default is specified.', 1);
             }
         }
@@ -201,7 +205,7 @@ class MultiMailer
      */
     protected static function getSwiftMailer($config, $timeout = null, $frequency = null)
     {
-        $provider = (!empty($config['provider'])) ? $config['provider'] : config('multimail.provider.default');
+        $provider = static::getProvider($config['provider'] ?? null);
 
         if (isset($provider['driver']) && $provider['driver'] == 'log') {
             $transport = static::getLogTransport();
@@ -218,5 +222,24 @@ class MultiMailer
         }
 
         return $swift_mailer;
+    }
+
+    /**
+     * Get array of provdier (Host/Port/Encyption/Driver).
+     * If no provider specified, use default.
+     * @param  string provider
+     * @return array
+     */
+    protected static function getProvider($provider = null)
+    {
+        if (!empty($provider)) {
+            $provider = config('multimail.provider.' . $provider);
+
+            if (!empty($provider)) {
+                return $provider;
+            }
+        }
+
+        return config('multimail.provider.default');
     }
 }
