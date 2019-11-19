@@ -178,7 +178,7 @@ class MultiMailer
      */
     protected static function getSMTPTransport($config)
     {
-        $provider = (!empty($config['provider'])) ? $config['provider'] : config('multimail.provider.default');
+        $provider = static::getProvider($config['provider']);
 
         $transport = new Swift_SmtpTransport($provider['host'], $provider['port'], $provider['encryption']);
         $transport->setUsername($config['username']);
