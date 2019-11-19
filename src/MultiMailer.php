@@ -176,10 +176,8 @@ class MultiMailer
      * @param  array
      * @return Swift_SmtpTransport
      */
-    protected static function getSMTPTransport($config)
+    protected static function getSMTPTransport($config, $provider)
     {
-        $provider = static::getProvider($config['provider']);
-
         $transport = new Swift_SmtpTransport($provider['host'], $provider['port'], $provider['encryption']);
         $transport->setUsername($config['username']);
         $transport->setPassword($config['pass']);
@@ -213,7 +211,7 @@ class MultiMailer
             return new Swift_Mailer($transport);
         }
 
-        $transport = static::getSMTPTransport($config);
+        $transport = static::getSMTPTransport($config, $provider);
 
         $swift_mailer = new Swift_Mailer($transport);
 
