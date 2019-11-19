@@ -1,8 +1,8 @@
 # Laravel-MultiMail
 
-This lightweight package helps you to send mails from your Laravel application from multiple email accounts and multipe providers,for example `office@domain.com`, `contact@domain.com`, and `info@test.net`.
+This lightweight package helps you to send mails from your Laravel application from multiple email accounts and multiple providers,for example `office@domain.com`, `contact@domain.com`, and `info@test.net`.
 
-The pacakge supports sending queued, localized and bulk mails.
+The package supports sending queued, localized and bulk mails.
 
 This package works for `SMTP` and `log` drivers.
 
@@ -94,7 +94,7 @@ Mailable:
     public function build()
     {
         return $this->markdown('emails.invitation')
-                    ->subject('Invitation mail')
+                    ->subject('Invitation mail');
     }
 
 ### Multiple Mail Providers & Drivers
@@ -125,14 +125,14 @@ If you wish to send from mails with different provider, then you may create anot
           'host'       => env('MAIL_HOST'),
           'port'       => env('MAIL_PORT'),
           'encryption' => env('MAIL_ENCRYPTION'),
-          'driver'     => env('MAIL_DRIVER'), 
+          'driver'     => env('MAIL_DRIVER'),
         ],
       'new_provider' =>
         [
           'host'      => env('MAIL_HOST_PROVIDER_B'),
           'port'      => env('MAIL_PORT_PROVIDER_B'),
           'encryption' => env('MAIL_ENCRYPTION_PROVIDER_B'),
-	  'driver'     => env('MAIL_DRIVER_B'), 
+	  'driver'     => env('MAIL_DRIVER_B'),
         ]'
     ],
 
@@ -143,7 +143,7 @@ For bulk messages, you may first require a mailer object. You can define a pause
 
 	$mailer = \MultiMail::getMailer('office@example.com' , $timeout, $frequency);
 
-Then you can iterate through your list. 
+Then you can iterate through your list.
 
     foreach($users as $user){
 	$mailer->send(new \App\Mail\Invitation($user));
@@ -184,8 +184,7 @@ In your production environment simply provide all credentials into your local `.
 
 #### Local environment
 
-Do not specify any email acounts in your local `.env`. Otherwise you may risk to send testing mails to actual users.
+Do not specify any email accounts in your local `.env`. Otherwise you may risk to send testing mails to actual users.
 Instead use `log` driver or setup a fake mail SMTP account like [mailtrap](https://mailtrap.io/) or similar services.
 
-If you want to use a fake mail SMPT account for testing, it is not needed to specifiy the same credentials for any email account. Instead, simply provide a default mail account (see above `Default mailaccount`).
-
+If you want to use a fake mail SMPT account for testing, it is not needed to specify the same credentials for any email account. Instead, simply provide a default mail account (see above `Default mail account`).
