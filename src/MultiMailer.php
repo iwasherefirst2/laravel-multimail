@@ -16,6 +16,8 @@ class MultiMailer
 
     protected $locale;
 
+    protected static $plugins;
+
     /**
      * Send mail throug mail account form $mailer_name
      * @param  MailableContract $mailable
@@ -28,9 +30,14 @@ class MultiMailer
         if (empty($mailer_name)) {
             return \Mail::send($mailable);
         }
-
         $mailer = static::getMailer($mailer_name);
+
         $mailable->send($mailer);
+    }
+
+    public static function registerPlugin($plugin)
+    {
+       static::$plugins[] =$plugin;
     }
 
     public static function queueMail(MailableContract $mailable, $mailer_name)
@@ -201,23 +208,31 @@ class MultiMailer
      * @param  array
      * @return Swift_Mailer
      */
-    protected static function getSwiftMailer($config, $timeout = null, $frequency = null)
+    public static function getSwiftMailer($config, $timeout = null, $frequency = null)
     {
         $provider = static::getProvider($config['provider'] ?? null);
 
         if (isset($provider['driver']) && $provider['driver'] == 'log') {
             $transport = static::getLogTransport();
 
-            return new Swift_Mailer($transport);
+            $swift_mailer = new Swift_Mailer($transport);
+        }
+        else{
+            $transport = static::getSMTPTransport($config, $provider);
+
+            $swift_mailer = new Swift_Mailer($transport);
+
+            if (!empty($frequency) && !empty($timeout)) {
+                $swift_mailer->registerPlugin(new \Swift_Plugins_AntiFloodPlugin($frequency, $timeout));
+            }
         }
 
-        $transport = static::getSMTPTransport($config, $provider);
-
-        $swift_mailer = new Swift_Mailer($transport);
-
-        if (!empty($frequency) && !empty($timeout)) {
-            $swift_mailer->registerPlugin(new \Swift_Plugins_AntiFloodPlugin($frequency, $timeout));
+        if(!empty(self::$plugins)){
+            foreach (self::$plugins as $plugin) {
+                $swift_mailer->registerPlugin($plugin);
+            }
         }
+
 
         return $swift_mailer;
     }

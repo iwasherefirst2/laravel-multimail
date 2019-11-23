@@ -1,3 +1,5 @@
 vendor
 .lock
 composer.lock
+.phpunit.result.cache
+tests/_report
