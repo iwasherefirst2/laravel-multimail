@@ -6,21 +6,10 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\View;
 use IWasHereFirst2\LaravelMultiMail\Facades\MultiMail;
 use IWasHereFirst2\LaravelMultiMail\Tests\TestCase;
-use Swift_Events_EventListener;
-use Swift_Message;
 
 class MultiMailTest extends TestCase
 {
     const FROM = 'test@fake.de';
-
-    protected $emails;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        MultiMail::registerPlugin(new TestingMailEventListener($this));
-    }
 
     /** @test */
     public function check_if_mail_is_sendable()
@@ -62,11 +51,6 @@ class MultiMailTest extends TestCase
 
         View::addLocation(__DIR__ . '/Fixtures');
     }
-
-    public function addEmail(Swift_Message $email)
-    {
-        $this->emails[] = $email;
-    }
 }
 
 class TestMail extends Mailable
@@ -79,20 +63,5 @@ class TestMail extends Mailable
     public function build()
     {
         return $this->view('view');
-    }
-}
-
-class TestingMailEventListener implements Swift_Events_EventListener
-{
-    protected $test;
-
-    public function __construct($test)
-    {
-        $this->test = $test;
-    }
-
-    public function beforeSendPerformed($event)
-    {
-        $this->test->addEmail($event->getMessage());
     }
 }
