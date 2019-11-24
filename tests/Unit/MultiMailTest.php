@@ -2,66 +2,27 @@
 
 namespace IWasHereFirst2\LaravelMultiMail\Tests\Unit;
 
-use Illuminate\Mail\Mailable;
-use Illuminate\Support\Facades\View;
 use IWasHereFirst2\LaravelMultiMail\Facades\MultiMail;
+use IWasHereFirst2\LaravelMultiMail\PendingMail;
 use IWasHereFirst2\LaravelMultiMail\Tests\TestCase;
 
 class MultiMailTest extends TestCase
 {
-    const FROM = 'test@fake.de';
-
     /** @test */
-    public function check_if_mail_is_sendable()
+    public function check_if_multi_chaining_works()
     {
         $to     = 'test@bar.com';
         $cc     = 'foo@bar.ur';
         $locale = 'de';
-        $from   = static::FROM;
+        $from   = 'exampli@foo.cc';
         $bcc    = ['oki@foo.berlin', 'rooky@mooky.de'];
-        $pendingMail = MultiMail::to($to)
-                              ->cc($cc)
-                              ->locale($locale)
-                              ->from($from)
-                              ->bcc($bcc)
-                              ->send(new TestMail());
 
-        $this->assertEquals(1, count($this->emails));
-    }
+        $classes = [];
 
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app)
-    {
+        $classes[] = MultiMail::from('dummy');
+        $classes[] = MultiMail::cc('dummy');
+        $classes[] = MultiMail::bcc('dummy');
 
-        // Setup default database to use sqlite :memory:
-        $app['config']->set('multimail.emails',
-        ['test@fake.de' => [
-            'pass'     => 'fakepass',
-            'username' => 'fakeusername',
-            'from'     => 'Who knows',
-        ]]);
-        $app['config']->set('multimail.provider.default', [
-            'driver'   => 'log',
-        ]);
-
-        View::addLocation(__DIR__ . '/Fixtures');
-    }
-}
-
-class TestMail extends Mailable
-{
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build()
-    {
-        return $this->view('view');
+        $this->assertContainsOnlyInstancesOf(PendingMail::class, $classes);
     }
 }

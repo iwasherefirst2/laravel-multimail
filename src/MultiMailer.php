@@ -5,18 +5,50 @@ namespace IWasHereFirst2\LaravelMultiMail;
 use \Illuminate\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Transport\LogTransport;
-use Psr\Log\LoggerInterface;
 use Swift_Mailer;
-use Swift_SmtpTransport;
+use Swift_Plugins_AntiFloodPlugin;
 
 class MultiMailer
 {
-    protected $mailer;
-
-    protected $locale;
-
+    /**
+     * Plugins for Swift_Mailer
+     * @var array
+     */
     protected static $plugins;
+
+    /**
+     * Create mailer from config/multimail.php
+     * If its not a log driver, add AntiFloodPlugin.
+     *
+     * @param  mixed $key  string or array
+     * @param  int timeout
+     * @param  int frequency
+     * @return \Illuminate\Mail\Mailer
+     */
+    public static function getMailer($key, $timeout = null, $frequency = null)
+    {
+        $config = new Config($key);
+
+        $swift_mailer = static::getSwiftMailer($config);
+
+        if (!$config->isLogDriver() && !empty($timeout) && !empty($frequency)) {
+            static::$plugins[] = new Swift_Plugins_AntiFloodPlugin($frequency, $timeout);
+        }
+
+        static::registerPlugins($swift_mailer);
+
+        $view   = app()->get('view');
+        $events = app()->get('events');
+        $mailer = new Mailer($view, $swift_mailer, $events);
+
+        $mailer->alwaysFrom($config->getFromEmail(), $config->getFromName());
+
+        if (!empty($reply_mail = $config->getReplyEmail())) {
+            $mailer->alwaysReplyTo($reply_mail, $config->getReplyEmail());
+        }
+
+        return $mailer;
+    }
 
     /**
      * Send mail throug mail account form $mailer_name
@@ -35,9 +67,29 @@ class MultiMailer
         $mailable->send($mailer);
     }
 
+    /**
+     * [registerPlugin description]
+     * @param  [type] $plugin [description]
+     * @return [type]         [description]
+     */
     public static function registerPlugin($plugin)
     {
-       static::$plugins[] =$plugin;
+        static::$plugins[] = $plugin;
+    }
+
+    /**
+     * [registerPlugin description]
+     * @param  [type] $plugin [description]
+     * @return [type]         [description]
+     */
+    public static function clearPlugins()
+    {
+        static::$plugins = [];
+    }
+
+    public static function getPlugins()
+    {
+        return static::$plugins;
     }
 
     public static function queueMail(MailableContract $mailable, $mailer_name)
@@ -47,58 +99,6 @@ class MultiMailer
             return \Mail::queue($mailable);
         }
         Jobs\SendMailJob::dispatch($mailer_name, $mailable);
-    }
-
-    /**
-     * Create mailer from config/multimail.php
-     * @param  mixed $name  string or array
-     * @param  int timeout
-     * @param  int frequency
-     * @return \Illuminate\Mail\Mailer
-     */
-    public static function getMailer($key, $timeout = null, $frequency = null)
-    {
-        if (is_array($key)) {
-            $from_name = $key['name'] ?? null;
-
-            if (empty($key['email'])) {
-                throw new \Exception("Mailer name has to be provided in array as column 'email' ", 1);
-            }
-            $email = $key['email'];
-        } else {
-            $email = $key;
-        }
-
-        $config   = config('multimail.emails')[$email];
-
-        if (empty($email) || empty($config) || empty($config['pass']) || empty($config['username'])) {
-            $config = config('multimail.emails.default');
-
-            $provider = static::getProvider($config['provider'] ?? null);
-
-            if ($provider['driver'] != 'log' && (empty($config) || empty($config['pass']) || empty($config['username']))) {
-                // No need for pass/username when using log-driver
-                throw new \Exception('Configuration for email: ' . $email . ' is missing in config/multimail.php and no default is specified.', 1);
-            }
-        }
-
-        $swift_mailer = static::getSwiftMailer($config, $timeout = null, $frequency = null);
-
-        $view = app()->get('view');
-        $events = app()->get('events');
-        $mailer = new Mailer($view, $swift_mailer, $events);
-
-        if (empty($from_name) && !empty($config['from_name'])) {
-            $from_name = $config['from_name'];
-        }
-
-        $mailer->alwaysFrom($config['from_mail'] ?? $email, $from_name ?? null);
-
-        if (!empty($config['reply_to_mail'])) {
-            $mailer->alwaysReplyTo($config['reply_to_mail'], $config['reply_to_name'] ?? null);
-        }
-
-        return $mailer;
     }
 
     /**
@@ -179,80 +179,31 @@ class MultiMailer
     }
 
     /**
-     * Get SMTP Transport
-     * @param  array
-     * @return Swift_SmtpTransport
-     */
-    protected static function getSMTPTransport($config, $provider)
-    {
-        $transport = new Swift_SmtpTransport($provider['host'], $provider['port'], $provider['encryption']);
-        $transport->setUsername($config['username']);
-        $transport->setPassword($config['pass']);
-
-        return $transport;
-    }
-
-    /**
-     * Get LOG Transport
-     * @return LogTransport
-     */
-    protected static function getLogTransport()
-    {
-        return new LogTransport(app()->make(LoggerInterface::class));
-    }
-
-    /**
      * Create SwiftMailer with timeout/frequency. Timeout/frequency is ignored
      * when Log Driver is used.
      *
      * @param  array
      * @return Swift_Mailer
      */
-    public static function getSwiftMailer($config, $timeout = null, $frequency = null)
+    protected static function getSwiftMailer($config)
     {
-        $provider = static::getProvider($config['provider'] ?? null);
+        if ($config->isLogDriver()) {
+            $transport = TransportManager::createLogDriver();
 
-        if (isset($provider['driver']) && $provider['driver'] == 'log') {
-            $transport = static::getLogTransport();
-
-            $swift_mailer = new Swift_Mailer($transport);
-        }
-        else{
-            $transport = static::getSMTPTransport($config, $provider);
-
-            $swift_mailer = new Swift_Mailer($transport);
-
-            if (!empty($frequency) && !empty($timeout)) {
-                $swift_mailer->registerPlugin(new \Swift_Plugins_AntiFloodPlugin($frequency, $timeout));
-            }
+            return new Swift_Mailer($transport);
         }
 
-        if(!empty(self::$plugins)){
-            foreach (self::$plugins as $plugin) {
+        $transport = TransportManager::createSmtpDriver($config);
+
+        return new Swift_Mailer($transport);
+    }
+
+    protected static function registerPlugins($swift_mailer)
+    {
+        if (!empty(static::$plugins)) {
+            foreach (static::$plugins as $plugin) {
                 $swift_mailer->registerPlugin($plugin);
             }
         }
-
-
-        return $swift_mailer;
-    }
-
-    /**
-     * Get array of provdier (Host/Port/Encyption/Driver).
-     * If no provider specified, use default.
-     * @param  string provider
-     * @return array
-     */
-    protected static function getProvider($provider = null)
-    {
-        if (!empty($provider)) {
-            $provider = config('multimail.provider.' . $provider);
-
-            if (!empty($provider)) {
-                return $provider;
-            }
-        }
-
-        return config('multimail.provider.default');
     }
 }

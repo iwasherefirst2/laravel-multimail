@@ -14,7 +14,8 @@
         "laravel/framework": "^5.6.0|^6.0.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^4.0"
+        "orchestra/testbench": "^4.0",
+        "guzzlehttp/guzzle": "^6.4"
     },
     "autoload": {
         "psr-4": {

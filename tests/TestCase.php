@@ -5,6 +5,7 @@ namespace IWasHereFirst2\LaravelMultiMail\Tests;
 use IWasHereFirst2\LaravelMultiMail\Facades\MultiMail;
 
 use IWasHereFirst2\LaravelMultiMail\MultiMailServiceProvider;
+use Mail;
 use Swift_Events_EventListener;
 use Swift_Message;
 
@@ -16,7 +17,10 @@ class TestCase extends \Orchestra\Testbench\TestCase
     {
         parent::setUp();
 
+        MultiMail::clearPlugins();
         MultiMail::registerPlugin(new TestingMailEventListener($this));
+        Mail::getSwiftMailer()
+                ->registerPlugin(new TestingMailEventListener($this));
     }
 
     public function addEmail(Swift_Message $email)
@@ -34,24 +38,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
     {
         return [MultiMailServiceProvider::class];
     }
-
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app)
-    {
-
-        // Setup default database to use sqlite :memory:
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
-            'database' => ':memory:',
-            'prefix'   => '',
-        ]);
-    }
 }
 
 class TestingMailEventListener implements Swift_Events_EventListener
@@ -61,6 +47,11 @@ class TestingMailEventListener implements Swift_Events_EventListener
     public function __construct($test)
     {
         $this->test = $test;
+    }
+
+    public function getDebugInfo()
+    {
+        return 'This is the Custom Test Case Event Plugin';
     }
 
     public function beforeSendPerformed($event)
