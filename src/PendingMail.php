@@ -4,6 +4,7 @@ namespace IWasHereFirst2\LaravelMultiMail;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use IWasHereFirst2\LaravelMultiMail\Facades\MultiMail;
 
 class PendingMail
 {
@@ -132,7 +133,7 @@ class PendingMail
     {
         $mailer = $this->fromMailer ?? optional($mailable)->fromMailer;
 
-        return MultiMailer::sendMail($this->fill($mailable), $mailer);
+        return MultiMail::sendMail($this->fill($mailable), $mailer);
     }
 
     /**
@@ -145,7 +146,7 @@ class PendingMail
     {
         $mailer = $this->fromMailer ?? optional($mailable)->fromMailer;
 
-        return MultiMailer::queueMail($this->fill($mailable), $mailer);
+        return MultiMail::queueMail($this->fill($mailable), $mailer);
     }
 
     /**

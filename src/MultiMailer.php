@@ -5,16 +5,19 @@ namespace IWasHereFirst2\LaravelMultiMail;
 use \Illuminate\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Mail\Mailable;
+use Illuminate\Support\Traits\Macroable;
 use Swift_Mailer;
 use Swift_Plugins_AntiFloodPlugin;
 
 class MultiMailer
 {
+    use Macroable;
+
     /**
      * Plugins for Swift_Mailer
      * @var array
      */
-    protected static $plugins;
+    protected $plugins;
 
     /**
      * Create mailer from config/multimail.php
@@ -25,17 +28,17 @@ class MultiMailer
      * @param  int frequency
      * @return \Illuminate\Mail\Mailer
      */
-    public static function getMailer($key, $timeout = null, $frequency = null)
+    public function getMailer($key, $timeout = null, $frequency = null)
     {
         $config = new Config($key);
 
-        $swift_mailer = static::getSwiftMailer($config);
+        $swift_mailer = $this->getSwiftMailer($config);
 
         if (!$config->isLogDriver() && !empty($timeout) && !empty($frequency)) {
-            static::$plugins[] = new Swift_Plugins_AntiFloodPlugin($frequency, $timeout);
+            $this->plugins[] = new Swift_Plugins_AntiFloodPlugin($frequency, $timeout);
         }
 
-        static::registerPlugins($swift_mailer);
+        $this->registerPlugins($swift_mailer);
 
         $view   = app()->get('view');
         $events = app()->get('events');
@@ -56,13 +59,13 @@ class MultiMailer
      * @param  [type]           $mailer_name ]
      * @return [type]                        [description]
      */
-    public static function sendMail(MailableContract $mailable, $mailer_name)
+    public function sendMail(MailableContract $mailable, $mailer_name)
     {
         // no mailer given, use default mailer
         if (empty($mailer_name)) {
             return \Mail::send($mailable);
         }
-        $mailer = static::getMailer($mailer_name);
+        $mailer = $this->getMailer($mailer_name);
 
         $mailable->send($mailer);
     }
@@ -72,9 +75,9 @@ class MultiMailer
      * @param  [type] $plugin [description]
      * @return [type]         [description]
      */
-    public static function registerPlugin($plugin)
+    public function registerPlugin($plugin)
     {
-        static::$plugins[] = $plugin;
+        $this->plugins[] = $plugin;
     }
 
     /**
@@ -82,17 +85,17 @@ class MultiMailer
      * @param  [type] $plugin [description]
      * @return [type]         [description]
      */
-    public static function clearPlugins()
+    public function clearPlugins()
     {
-        static::$plugins = [];
+        $this->plugins = [];
     }
 
-    public static function getPlugins()
+    public function getPlugins()
     {
-        return static::$plugins;
+        return $this->plugins;
     }
 
-    public static function queueMail(MailableContract $mailable, $mailer_name)
+    public function queueMail(MailableContract $mailable, $mailer_name)
     {
         // no mailer given, use default mailer
         if (empty($mailer_name)) {
@@ -185,7 +188,7 @@ class MultiMailer
      * @param  array
      * @return Swift_Mailer
      */
-    protected static function getSwiftMailer($config)
+    protected function getSwiftMailer($config)
     {
         if ($config->isLogDriver()) {
             $transport = TransportManager::createLogDriver();
@@ -198,10 +201,10 @@ class MultiMailer
         return new Swift_Mailer($transport);
     }
 
-    protected static function registerPlugins($swift_mailer)
+    protected function registerPlugins($swift_mailer)
     {
-        if (!empty(static::$plugins)) {
-            foreach (static::$plugins as $plugin) {
+        if (!empty($this->plugins)) {
+            foreach ($this->plugins as $plugin) {
                 $swift_mailer->registerPlugin($plugin);
             }
         }

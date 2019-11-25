@@ -17,7 +17,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
     {
         parent::setUp();
 
-        MultiMail::clearPlugins();
         MultiMail::registerPlugin(new TestingMailEventListener($this));
         Mail::getSwiftMailer()
                 ->registerPlugin(new TestingMailEventListener($this));

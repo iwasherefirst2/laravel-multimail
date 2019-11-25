@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use IWasHereFirst2\LaravelMultiMail\MultiMailer;
+use IWasHereFirst2\LaravelMultiMail\Facades\MultiMail;
 
 class SendMailJob implements ShouldQueue
 {
@@ -35,6 +35,6 @@ class SendMailJob implements ShouldQueue
      */
     public function handle()
     {
-        MultiMailer::sendMail($this->mailable, $this->mailer_name);
+        MultiMail::sendMail($this->mailable, $this->mailer_name);
     }
 }

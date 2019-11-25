@@ -25,4 +25,12 @@ class MultiMailTest extends TestCase
 
         $this->assertContainsOnlyInstancesOf(PendingMail::class, $classes);
     }
+
+    /** @test */
+    public function check_if_plugins_deletable()
+    {
+        MultiMail::clearPlugins();
+
+        $this->assertEquals([], MultiMail::getPlugins());
+    }
 }
