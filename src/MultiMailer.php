@@ -20,6 +20,12 @@ class MultiMailer
     protected $plugins;
 
     /**
+     * Mailers
+     * @var array
+     */
+    protected $mailers;
+
+    /**
      * Create mailer from config/multimail.php
      * If its not a log driver, add AntiFloodPlugin.
      *
@@ -30,6 +36,10 @@ class MultiMailer
      */
     public function getMailer($key, $timeout = null, $frequency = null)
     {
+        if (isset($this->mailers[$key])) {
+            return $this->mailers[$key];
+        }
+
         $config = new Config($key);
 
         $swift_mailer = $this->getSwiftMailer($config);
@@ -49,6 +59,8 @@ class MultiMailer
         if (!empty($reply_mail = $config->getReplyEmail())) {
             $mailer->alwaysReplyTo($reply_mail, $config->getReplyEmail());
         }
+
+        $this->mailers[$key] = $mailer;
 
         return $mailer;
     }
@@ -78,6 +90,9 @@ class MultiMailer
     public function registerPlugin($plugin)
     {
         $this->plugins[] = $plugin;
+
+        // clear stored mailers, they may need new plugins.
+        $this->mailers = [];
     }
 
     /**
@@ -88,6 +103,9 @@ class MultiMailer
     public function clearPlugins()
     {
         $this->plugins = [];
+
+        // clear stored mailers, they may need new plugins.
+        $this->mailers = [];
     }
 
     public function getPlugins()
