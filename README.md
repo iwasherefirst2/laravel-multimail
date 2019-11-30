@@ -6,7 +6,20 @@ The package supports sending queued, localized and bulk mails.
 
 This package works for `SMTP` and `log` drivers.
 
-## Requirments
+## Table of Contents
+
+- [Requirments](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+    - [Basic Examples](#basic-examples)
+    - [Queued Mails](#queued-mails)
+    - [Specify in Mailable)(#specify-in-mailable)
+    - [Multiple Mail Providers](#multiple-mail-providers)
+    - [Bulk messages](#bulk-messages)
+    - [Default mailaccount](#default-mailaccount)
+    - [Advice](#advice)
+
+## Requirements
 
 Laravel 5 or Laravel 6.
 
@@ -71,7 +84,7 @@ i.e. they are either send explicitly be the `queue` method or the mailable class
 
 It is of course necessary to install a [queue driver](https://laravel.com/docs/5.8/queues#driver-prerequisites).
 
-### Specify everything in mailable
+### Specify in mailable
 
 You may set `to`, `cc`, `bcc`, `locale` and `from`  in your mailable class. In this case, you could reduce the basic example from above to:
 
