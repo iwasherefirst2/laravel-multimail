@@ -13,7 +13,7 @@ This package works for `SMTP` and `log` drivers.
 - [Usage](#usage)
     - [Basic Examples](#basic-examples)
     - [Queued Mails](#queued-mails)
-    - [Specify in Mailable)(#specify-in-mailable)
+    - [Specify in Mailable](#specify-in-mailable)
     - [Multiple Mail Providers](#multiple-mail-providers)
     - [Bulk messages](#bulk-messages)
     - [Default mailaccount](#default-mailaccount)
