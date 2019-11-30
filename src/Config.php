@@ -124,6 +124,11 @@ class Config
         return $this->settings['reply_to_name'] ?? null;
     }
 
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
     /**
      * Parse $key into email and possible from name
      *

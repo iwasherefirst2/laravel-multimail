@@ -20,7 +20,7 @@ class TransportManager
         $setting  = $config->getSetting();
 
         $transport = new Swift_SmtpTransport($provider['host'], $provider['port'], $provider['encryption']);
-        $transport->setUsername($setting['username']);
+        $transport->setUsername($setting['username'] ?? $config->getEmail());
         $transport->setPassword($setting['pass']);
 
         return $transport;
