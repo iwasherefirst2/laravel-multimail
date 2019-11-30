@@ -1,6 +1,6 @@
 # Laravel-MultiMail
 
-This lightweight package helps you to send mails from your Laravel application from multiple email accounts and multiple providers,for example `office@domain.com`, `contact@domain.com`, and `info@test.net`.
+This package helps you to send mails from your Laravel application from multiple email accounts and multiple providers,for example `office@domain.com`, `contact@domain.com`, and `info@test.net`.
 
 The package supports sending queued, localized and bulk mails.
 
@@ -8,7 +8,7 @@ This package works for `SMTP` and `log` drivers.
 
 ## Requirments
 
-Laravel 5.6 or above. Also compatible with Laravel 6.0.
+Laravel 5 or Laravel 6.
 
 ## Installation
 
@@ -26,22 +26,28 @@ Configure your email clients in `config/multimail.php`:
         'office@example.net' =>
             [
               'pass'     => env('first_mail_password'),
-              'username' => env('first_mail_username'),
               'from'     => "Max Musterman",
             ],
         'contact@example.net'  =>
             [
-              'pass'     => env('second_mail_password'),
-              'username' => env('second_mail_username'),
-              'from'     => "Alice Armania",
+              'pass'     => env('second_mail_password')
             ],
     ],
 
 Make sure to put your credentials in the `.env` file, so they don't get tracked in your repository.
 
+For each mail you may specify multiple columns:
+
+Attribut | Functionality | required 
+--- | --- | ---
+`pass` | Password of email account | yes
+`username` | Username of email account, only neccessary if different from email address | no
+`from` | Name that should appear in front of email | no
+`provider` | Provider of email account, only necessary if mail host/encription/port is not default (see [here](#multiple-mail-providers) for more | no
+
 ## Usage
 
-One may send a mail using `\MultiMail` instead of `\Mail`. The methods `to`, `cc`, `bcc`, `locale` are exactly the same as provided by the [mail facade](https://laravel.com/docs/5.8/mail#sending-mail).
+One may send a mail using `\MultiMail` instead of `\Mail`. The methods `to`, `cc`, `bcc`, `locale` are exactly the same as provided by the [mail facade](https://laravel.com/docs/5.8/mail#sending-mail) (note that `locale` is only available since Laravel 5.6).
 
 The `from` method from `MultiMail` needs a string of an email provided in `config/multimail.php`. When using `send` or `queue` the mail will be send from the mail account specified in `cofing/multimail.php`.
 
@@ -97,7 +103,7 @@ Mailable:
                     ->subject('Invitation mail');
     }
 
-### Multiple Mail Providers & Drivers
+### Multiple Mail Providers 
 
 If you wish to send from mails with different provider, then you may create another provider in the `provider` array and reference it inside the `emails` array:
 
@@ -174,7 +180,7 @@ You may provide `default` credentials inside the `email` array from `config/mult
           ]
     ],
 
-When `first_mail_password` and `first_mail_username` are empty, `office@example.net` will use credentials specified by `default`. This is useful for your local development, when you want to send all mains from one mailaccount while testing.
+When `first_mail_password` and `first_mail_username` are empty, `office@example.net` will use credentials specified by `default`. This is useful for your local development, when you want to send all mails from one mailaccount while testing. This way you only need to specify `MAIL_PASSWORD` and `MAIL_USERNAME` locally.
 
 ### Advice
 
