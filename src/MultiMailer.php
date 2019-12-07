@@ -36,11 +36,11 @@ class MultiMailer
      */
     public function getMailer($key, $timeout = null, $frequency = null)
     {
-        if (isset($this->mailers[$key])) {
-            return $this->mailers[$key];
-        }
-
         $config = new Config($key);
+
+        if (isset($this->mailers[$config->getEmail()])) {
+            return $this->mailers[$config->getEmail()];
+        }
 
         $swift_mailer = $this->getSwiftMailer($config);
 
@@ -60,7 +60,7 @@ class MultiMailer
             $mailer->alwaysReplyTo($reply_mail, $config->getReplyEmail());
         }
 
-        $this->mailers[$key] = $mailer;
+        $this->mailers[$config->getEmail()] = $mailer;
 
         return $mailer;
     }

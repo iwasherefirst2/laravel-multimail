@@ -33,6 +33,16 @@ class MultiMailTest extends TestCase
     }
 
     /** @test */
+    public function check_if_from_name_works()
+    {
+        MultiMail::clearPlugins();
+
+        MultiMail::to('test@bar.com')->from(['name' => 'Adam', 'email' => 'test@fake.de'])->send(new TestMail());
+
+        $this->assertEquals([], MultiMail::getPlugins());
+    }
+
+    /** @test */
     public function send_mail_directly()
     {
         MultiMail::send(new TestMailIncludingFrom());
