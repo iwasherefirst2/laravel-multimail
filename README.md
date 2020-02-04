@@ -152,6 +152,7 @@ If you wish to send from mails with different provider, then you may create anot
           'port'      => env('MAIL_PORT_PROVIDER_B'),
           'encryption' => env('MAIL_ENCRYPTION_PROVIDER_B'),
 	  'driver'     => env('MAIL_DRIVER_B'),
+	  // you may also add options like `stream`, `source_ip` and `local_domain` 
         ]'
     ],
 
