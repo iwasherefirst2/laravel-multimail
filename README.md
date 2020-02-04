@@ -1,6 +1,8 @@
 # Laravel-MultiMail
 
-This package helps you to send mails from your Laravel application from multiple email accounts and multiple providers,for example `office@domain.com`, `contact@domain.com`, and `info@test.net`.
+![Mail image](https://miro.medium.com/max/640/1*XAhO69eFPH6p32VlylUCaw.png)
+
+This package helps you to send mails from your Laravel application from multiple email accounts.
 
 The package supports sending queued, localized and bulk mails.
 
