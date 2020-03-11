@@ -41,7 +41,7 @@ Configure your email clients in `config/multimail.php`:
         'office@example.net' =>
             [
               'pass'     => env('first_mail_password'),
-              'from'     => "Max Musterman",
+              'from_name'     => "Max Musterman",
             ],
         'contact@example.net'  =>
             [
@@ -128,14 +128,14 @@ If you wish to send from mails with different provider, then you may create anot
             [
               'pass'     => env('first_mail_password'),
               'username' => env('first_mail_username'),
-              'from'     => "Max Musterman",   
+              'from_name'     => "Max Musterman",   
                                                         // <------ no provider given because 'default' provider is used
             ],
         'contact@other_domain.net'  =>
             [
               'pass'     => env('second_mail_password'),
               'username' => env('second_mail_username'),
-              'from'     => "Alice Armania",
+              'from_name'     => "Alice Armania",
               'provider' => 'new_provider',            // <------ specify new provider here
             ],
     ],
@@ -181,13 +181,13 @@ You may provide `default` credentials inside the `email` array from `config/mult
             [
               'pass'     => env('first_mail_password'),
               'username' => env('first_mail_username'),
-              'from'     => "Max Musterman",
+              'from_name'     => "Max Musterman",
             ],
         'contact@example.net'  =>
             [
               'pass'     => env('second_mail_password'),
               'username' => env('second_mail_username'),
-              'from'     => "Alice Armania",
+              'from_name'     => "Alice Armania",
             ],
         'default' =>
           [
