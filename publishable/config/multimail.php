@@ -11,18 +11,16 @@ return [
     */
 
     'emails'  => [
-        'office' =>
+        'office@example.com' =>
             [
               'pass'          => env('MAIL_PASSWORD'),
               'username'      => env('MAIL_USERNAME'),
-              'from_mail'     => 'office@crazy.com',
               'from_name'     => "Max Musterman",
               'reply_to_mail' => 'reply@example.com',
             ],
-        'contact'  =>
+        'contact@example.net'  =>
             [
               'pass'     => env('second_mail_password'),
-              'username' => env('second_mail_username'),
             ],
     ],
 
