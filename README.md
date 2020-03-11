@@ -57,7 +57,7 @@ Attribut | Functionality | required
 --- | --- | ---
 `pass` | Password of email account | yes
 `username` | Username of email account, only neccessary if different from email address | no
-`from` | Name that should appear in front of email | no
+`from_name` | Name that should appear in front of email | no
 `provider` | Provider of email account, only necessary if mail host/encription/port is not default (see [here](#multiple-mail-providers) for more) | no
 
 ## Usage
