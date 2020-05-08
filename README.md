@@ -1,4 +1,4 @@
-# Laravel-MultiMail
+# Laravel Multimail
 
 ![Mail image](https://miro.medium.com/max/640/1*XAhO69eFPH6p32VlylUCaw.png)
 
