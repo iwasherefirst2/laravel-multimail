@@ -23,7 +23,7 @@ This package works for `SMTP` and `log` drivers.
 
 ## Requirements
 
-Laravel 5 or Laravel 6.
+Laravel 5 and higher
 
 ## Installation
 
