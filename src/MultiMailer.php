@@ -73,7 +73,10 @@ class MultiMailer
      */
     public function sendMail(MailableContract $mailable, $mailer_name)
     {
-        // no mailer given, use default mailer
+        if (\App::runningUnitTests() && config('multimail.use_default_mail_facade_in_tests')) {
+            return \Mail::send($mailable);
+        }
+      
         if (empty($mailer_name)) {
             return \Mail::send($mailable);
         }

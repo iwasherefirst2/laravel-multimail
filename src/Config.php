@@ -202,7 +202,7 @@ class Config
 
         $this->loadProvider();
 
-        if ($this->provider['driver'] != 'log' && (empty($this->settings) || empty($this->settings['pass']) || empty($this->settings['username']))) {
+        if ((!isset($this->provider['driver']) || $this->provider['driver'] != 'log') && (empty($this->settings) || empty($this->settings['pass']) || empty($this->settings['username']))) {
             throw new Exceptions\NoDefaultException($this->email);
         }
     }

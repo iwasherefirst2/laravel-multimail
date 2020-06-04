@@ -19,7 +19,7 @@ This package works for `SMTP` and `log` drivers.
     - [Multiple Mail Providers](#multiple-mail-providers)
     - [Bulk messages](#bulk-messages)
     - [Default mailaccount](#default-mailaccount)
-    - [Advice](#advice)
+    - [Testing](#testing)
 
 ## Requirements
 
@@ -53,7 +53,7 @@ Make sure to put your credentials in the `.env` file, so they don't get tracked 
 
 For each mail you may specify multiple columns:
 
-Attribut | Functionality | required 
+Attribut | Functionality | required
 --- | --- | ---
 `pass` | Password of email account | yes
 `username` | Username of email account, only neccessary if different from email address | no
@@ -118,7 +118,7 @@ Mailable:
                     ->subject('Invitation mail');
     }
 
-### Multiple Mail Providers 
+### Multiple Mail Providers
 
 If you wish to send from mails with different provider, then you may create another provider in the `provider` array and reference it inside the `emails` array:
 
@@ -154,7 +154,7 @@ If you wish to send from mails with different provider, then you may create anot
           'port'      => env('MAIL_PORT_PROVIDER_B'),
           'encryption' => env('MAIL_ENCRYPTION_PROVIDER_B'),
 	  'driver'     => env('MAIL_DRIVER_B'),
-	  // you may also add options like `stream`, `source_ip` and `local_domain` 
+	  // you may also add options like `stream`, `source_ip` and `local_domain`
         ]'
     ],
 
@@ -198,15 +198,23 @@ You may provide `default` credentials inside the `email` array from `config/mult
 
 When `first_mail_password` and `first_mail_username` are empty, `office@example.net` will use credentials specified by `default`. This is useful for your local development, when you want to send all mails from one mailaccount while testing. This way you only need to specify `MAIL_PASSWORD` and `MAIL_USERNAME` locally.
 
-### Advice
+### Testing
 
-#### Production environment
-
-In your production environment simply provide all credentials into your local `.env` file.
-
-#### Local environment
+#### Don't put credentials in local `env`
 
 Do not specify any email accounts in your local `.env`. Otherwise you may risk to send testing mails to actual users.
-Instead use `log` driver or setup a fake mail SMTP account like [mailtrap](https://mailtrap.io/) or similar services.
 
-If you want to use a fake mail SMPT account for testing, it is not needed to specify the same credentials for any email account. Instead, simply provide a default mail account (see above `Default mail account`).
+#### Use one fake mail account or log
+
+Use `log` driver or setup a fake mail SMTP account like [mailtrap](https://mailtrap.io/) or similar services.
+
+It is not needed to specify the same credentials for all your email accounts. Instead, simply provide a default mail account (see above `Default mail account`).
+
+#### Use log mail driver on testing
+
+To avoid latency, I recommend to always use the `log` mail driver when `phpunit` is running. You can set the mail driver in your `phpunit.xml` file like this: `<env name="MAIL_DRIVER" value="log"/>`.
+
+#### Use Mocking
+
+If you want to use the mocking feature [Mail fake](https://laravel.com/docs/mocking#mail-fake) during your tests, enable `use_default_mail_facade_in_tests`
+in your config file `config/multimail.php`. Note that `assertQueued` will never be true, because `queued` mails are actually send through `sent` through a job.

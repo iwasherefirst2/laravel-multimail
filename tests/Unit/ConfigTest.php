@@ -94,12 +94,12 @@ class ConfigTest extends TestCase
                 'reply_to_mail' => 'bs@web.de',
                 'reply_to_name' => 'max',
             ],
-            'test@empty.de' => [
-                'pass'          => '',
-                'username'      => '',
-                'from'          => 'Who knows',
-                'reply_to_mail' => 'bs@web.de',
-                'reply_to_name' => 'max',
-            ], ]);
+                'test@empty.de' => [
+                    'pass'          => '',
+                    'username'      => '',
+                    'from'          => 'Who knows',
+                    'reply_to_mail' => 'bs@web.de',
+                    'reply_to_name' => 'max',
+                ], ]);
     }
 }
