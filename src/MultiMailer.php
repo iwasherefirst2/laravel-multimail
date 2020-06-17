@@ -52,7 +52,12 @@ class MultiMailer
 
         $view   = app()->get('view');
         $events = app()->get('events');
-        $mailer = new Mailer($view, $swift_mailer, $events);
+        $mailer = null;
+        if (version_compare(app()->version(), '7.0.0') >= 0) {
+            $mailer = new Mailer(config('app.name'), $view, $swift_mailer, $events);
+        } else {
+            $mailer = new Mailer($view, $swift_mailer, $events);
+        }
 
         $mailer->alwaysFrom($config->getFromEmail(), $config->getFromName());
 
