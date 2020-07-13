@@ -218,7 +218,7 @@ To avoid latency, I recommend to always use the `log` mail driver when `phpunit`
 #### Use Mocking
 
 If you want to use the mocking feature [Mail fake](https://laravel.com/docs/mocking#mail-fake) during your tests, enable `use_default_mail_facade_in_tests`
-in your config file `config/multimail.php`. Note that `assertQueued` will never be true, because `queued` mails are actually send through `sent` through a job.
+in your config file `config/multimail.php`. Note that `assertQueued` will never be true, because `queued` mails are actually send through `sent` through a job. Therefore, always use `assertSent`.
 
 ### Troubleshoot
 
