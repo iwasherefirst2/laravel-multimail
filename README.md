@@ -16,11 +16,12 @@ This package works for `SMTP` and `log` drivers.
     - [Basic Examples](#basic-examples)
     - [Queued Mails](#queued-mails)
     - [Specify in Mailable](#specify-in-mailable)
-    - [Multiple Mail Providers](#multiple-mail-providers)
     - [Bulk messages](#bulk-messages)
+- [Special Settings](#special-settings)
+    - [Multiple Mail Providers](#multiple-mail-providers)
     - [Default mailaccount](#default-mailaccount)
-    - [Testing](#testing)
-    - [Troubleshoot](#troubleshoot)
+- [Testing](#testing)
+- [Troubleshoot](#troubleshoot)
 
 ## Requirements
 
@@ -118,6 +119,23 @@ Mailable:
         return $this->markdown('emails.invitation')
                     ->subject('Invitation mail');
     }
+    
+    
+
+### Bulk messages
+
+For bulk messages, you may first require a mailer object. You can define a pause in seconds ($timeout) after a number of mails ($frequency) has been send.
+
+	$mailer = \MultiMail::getMailer('office@example.com' , $timeout, $frequency);
+
+Then you can iterate through your list.
+
+    foreach($users as $user){
+	$mailer->send(new \App\Mail\Invitation($user));
+    };
+
+
+## Special Settings
 
 ### Multiple Mail Providers
 
@@ -160,18 +178,6 @@ If you wish to send from mails with different provider, then you may create anot
     ],
 
 
-### Bulk messages
-
-For bulk messages, you may first require a mailer object. You can define a pause in seconds ($timeout) after a number of mails ($frequency) has been send.
-
-	$mailer = \MultiMail::getMailer('office@example.com' , $timeout, $frequency);
-
-Then you can iterate through your list.
-
-    foreach($users as $user){
-	$mailer->send(new \App\Mail\Invitation($user));
-    };
-
 
 ### Default mailaccount
 
@@ -199,7 +205,7 @@ You may provide `default` credentials inside the `email` array from `config/mult
 
 When `first_mail_password` and `first_mail_username` are empty, `office@example.net` will use credentials specified by `default`. This is useful for your local development, when you want to send all mails from one mailaccount while testing. This way you only need to specify `MAIL_PASSWORD` and `MAIL_USERNAME` locally.
 
-### Testing
+## Testing
 
 #### Don't put credentials in local `env`
 
@@ -220,7 +226,7 @@ To avoid latency, I recommend to always use the `log` mail driver when `phpunit`
 If you want to use the mocking feature [Mail fake](https://laravel.com/docs/mocking#mail-fake) during your tests, enable `use_default_mail_facade_in_tests`
 in your config file `config/multimail.php`. Note that `assertQueued` will never be true, because `queued` mails are actually send through `sent` through a job. Therefore, always use `assertSent`.
 
-### Troubleshoot
+## Troubleshoot
 
 #### Laravel 7 is not working
 
