@@ -2,7 +2,7 @@
 
 namespace IWasHereFirst2\LaravelMultiMail\Tests\Unit;
 
-use IWasHereFirst2\LaravelMultiMail\Config;
+use IWasHereFirst2\LaravelMultiMail\FileConfigMailSettings;
 use IWasHereFirst2\LaravelMultiMail\Exceptions\EmailNotInConfigException;
 use IWasHereFirst2\LaravelMultiMail\Exceptions\InvalidConfigKeyException;
 use IWasHereFirst2\LaravelMultiMail\Exceptions\NoDefaultException;
@@ -15,7 +15,7 @@ class ConfigTest extends TestCase
     {
         $this->expectException(EmailNotInConfigException::class);
 
-        new Config('unknown key');
+        (new FileConfigMailSettings())->initialize('unknown key');
     }
 
     /** @test */
@@ -23,13 +23,13 @@ class ConfigTest extends TestCase
     {
         $this->expectException(InvalidConfigKeyException::class);
 
-        new Config(['unknown key']);
+        (new FileConfigMailSettings())->initialize(['unknown key']);
     }
 
     /** @test */
     public function create_config_with_valid_key()
     {
-        $config = new Config(['name' => 'Adam', 'email' => 'test@fake.de']);
+        $config = (new FileConfigMailSettings())->initialize(['name' => 'Adam', 'email' => 'test@fake.de']);
 
         $this->assertEquals('test@fake.de', $config->getFromEmail());
     }
@@ -45,7 +45,7 @@ class ConfigTest extends TestCase
     /** @test */
     public function get_reply_name()
     {
-        $config = new Config(['name' => 'Adam', 'email' => 'test@fake.de']);
+        $config = (new FileConfigMailSettings())->initialize(['name' => 'Adam', 'email' => 'test@fake.de']);
 
         $this->assertEquals('max', $config->getReplyName());
     }
@@ -54,7 +54,7 @@ class ConfigTest extends TestCase
     public function load_invalid_default()
     {
         $this->expectException(NoDefaultException::class);
-        $config = new Config(['name' => 'Adam', 'email' => 'test@empty.de']);
+        $config = (new FileConfigMailSettings())->initialize(['name' => 'Adam', 'email' => 'test@empty.de']);
     }
 
     /** @test */
@@ -73,7 +73,7 @@ class ConfigTest extends TestCase
             'driver'   => 'log',
         ]);
 
-        $config = new Config(['name' => 'Adam', 'email' => 'test@empty.de']);
+        $config = (new FileConfigMailSettings())->initialize(['name' => 'Adam', 'email' => 'test@empty.de']);
 
         $this->assertNotNull($config);
     }

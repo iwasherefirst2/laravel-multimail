@@ -20,8 +20,9 @@ This package works for `SMTP` and `log` drivers.
 - [Special Settings](#special-settings)
     - [Multiple Mail Providers](#multiple-mail-providers)
     - [Default mailaccount](#default-mailaccount)
-- [Testing](#testing)
-- [Troubleshoot](#troubleshoot)
+    - [Testing](#testing)
+    - [Get Mail From Database](#get-mail-from-database)
+    - [Troubleshoot](#troubleshoot)
 
 ## Requirements
 
@@ -224,7 +225,35 @@ To avoid latency, I recommend to always use the `log` mail driver when `phpunit`
 #### Use Mocking
 
 If you want to use the mocking feature [Mail fake](https://laravel.com/docs/mocking#mail-fake) during your tests, enable `use_default_mail_facade_in_tests`
-in your config file `config/multimail.php`. Note that `assertQueued` will never be true, because `queued` mails are actually send through `sent` through a job. Therefore, always use `assertSent`.
+in your config file `config/multimail.php`. Note that `assertQueued` will never be true, because `queued` mails are actually send through `sent` through a job.
+
+### Get Mail From Database
+
+If you want to load your mail account configuration from database
+or anything else, just create a class that implements `\IWasHereFirst2\LaravelMultiMail\MailSettings`
+and specify the class in `config/multimail.php` under the key `mail_settings_class`.
+
+For example:
+
+    <?php
+    
+    return [
+        /*
+        |--------------------------------------------------------------------------
+        | List your email providers
+        |--------------------------------------------------------------------------
+        |
+        | Enjoy a life with multimail
+        |
+        */
+        'use_default_mail_facade_in_tests' => true,
+    
+        'mail_settings_class' => \App\MyCustomMailSettings::class,
+    
+    ];
+    
+Notice that you do not need to specify `email` or `provider` in the config anymore.
+They should be loaded by your custom class `\App\MyCustomMailSettings::class`.
 
 ## Troubleshoot
 

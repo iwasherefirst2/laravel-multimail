@@ -26,6 +26,20 @@ class MultiMailer
     protected $mailers;
 
     /**
+     * @var FileConfigMailSettings
+     */
+    private $config;
+
+    /**
+     * MultiMailer constructor.
+     * @param FileConfigMailSettings $config
+     */
+    public function __construct(MailSettings $config)
+    {
+        $this->config = $config;
+    }
+
+    /**
      * Create mailer from config/multimail.php
      * If its not a log driver, add AntiFloodPlugin.
      *
@@ -36,7 +50,7 @@ class MultiMailer
      */
     public function getMailer($key, $timeout = null, $frequency = null)
     {
-        $config = new Config($key);
+        $config = $this->config->initialize($key);
 
         if (isset($this->mailers[$config->getEmail()])) {
             return $this->mailers[$config->getEmail()];
