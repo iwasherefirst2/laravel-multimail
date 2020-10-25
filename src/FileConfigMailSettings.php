@@ -1,15 +1,18 @@
 <?php
 
+
 namespace IWasHereFirst2\LaravelMultiMail;
 
-class Config
+use \IWasHereFirst2\LaravelMultiMail\MailSettings;
+
+class FileConfigMailSettings implements MailSettings
 {
     /**
      * Name from mail sender.
      *
      * @var string
      */
-    protected $name;
+    private $name;
 
     /**
      * Email from mail sender.
@@ -17,14 +20,14 @@ class Config
      *
      * @var string
      */
-    protected $email;
+    private $email;
 
     /**
      * Driver, Host, Port & Encryption.
      *
      * @var array
      */
-    protected $provider;
+    private $provider;
 
     /**
      * Email settings.
@@ -32,19 +35,23 @@ class Config
      *
      * @var array
      */
-    protected $settings;
+    private $settings;
 
-    /**
-     * Load config settings by key
-     *
-     * @param mixed Either string of email, or array of form ['email' => .., 'name' => .. ]
-     */
-    public function __construct($key)
+    public function initialize($key)
     {
-        // Retreive email
         $this->parseEmail($key);
 
-        $this->loadConfiguration();
+        try {
+            $this->settings   = config('multimail.emails')[$this->email];
+        } catch (\Exception $e) {
+            throw new Exceptions\EmailNotInConfigException($this->email);
+        }
+
+        if (empty($this->name)) {
+            $this->name = $this->settings['from_name'] ?? null;
+        }
+
+        $this->loadProvider();
 
         // If credentials are empty, load default values.
         // This makes local testing for many emails
@@ -52,8 +59,9 @@ class Config
         if ($this->isEmpty()) {
             $this->loadDefault();
         }
-    }
 
+        return $this;
+    }
     /**
      * Check if log driver is used.
      *
@@ -130,62 +138,11 @@ class Config
     }
 
     /**
-     * Parse $key into email and possible from name
-     *
-     * @param  mixed string/array
-     * @return void
-     */
-    protected function parseEmail($key)
-    {
-        if (is_array($key)) {
-            $this->name = $key['name'] ?? null;
-
-            if (empty($key['email'])) {
-                throw new Exceptions\InvalidConfigKeyException;
-            }
-            $this->email = $key['email'];
-        } else {
-            $this->email = $key;
-        }
-    }
-
-    /**
-     * Load config settings and provder from email
-     *
-     * @return void
-     */
-    protected function loadConfiguration()
-    {
-        try {
-            $this->settings   = config('multimail.emails')[$this->email];
-        } catch (\Exception $e) {
-            throw new Exceptions\EmailNotInConfigException($this->email);
-        }
-
-        if (empty($this->name)) {
-            $this->name = $this->settings['from_name'] ?? null;
-        }
-
-        $this->loadProvider();
-    }
-
-    protected function loadProvider()
-    {
-        if (!empty($this->settings['provider'])) {
-            $this->provider = config('multimail.provider.' . $this->settings['provider']);
-        }
-
-        if (empty($this->provider)) {
-            $this->provider = config('multimail.provider.default');
-        }
-    }
-
-    /**
      * Check if email, pass and username are not empty
      *
      * @return boolean
      */
-    protected function isEmpty()
+    private function isEmpty()
     {
         return (empty($this->email) || empty($this->settings) || empty($this->settings['pass']) || empty($this->settings['username']));
     }
@@ -196,7 +153,7 @@ class Config
      *
      * @return void
      */
-    protected function loadDefault()
+    private function loadDefault()
     {
         $this->settings = config('multimail.emails.default');
 
@@ -204,6 +161,40 @@ class Config
 
         if ((!isset($this->provider['driver']) || $this->provider['driver'] != 'log') && (empty($this->settings['pass']) || empty($this->settings['username']))) {
             throw new Exceptions\NoDefaultException($this->email);
+        }
+    }
+
+    /**
+     * Parse $key into email and possible from name
+     *
+     * @param  mixed string/array
+     * @return void
+     */
+    private function parseEmail($key)
+    {
+        if (!is_array($key)) {
+            $this->email = $key;
+            return;
+        }
+
+        $this->name = $key['name'] ?? null;
+
+        if (empty($key['email'])) {
+            throw new Exceptions\InvalidConfigKeyException;
+        }
+
+        $this->email = $key['email'];
+    }
+
+
+    private function loadProvider()
+    {
+        if (!empty($this->settings['provider'])) {
+            $this->provider = config('multimail.provider.' . $this->settings['provider']);
+        }
+
+        if (empty($this->provider)) {
+            $this->provider = config('multimail.provider.default');
         }
     }
 }
