@@ -4,3 +4,4 @@ composer.lock
 .phpunit.result.cache
 tests/_report
 .env
+.idea

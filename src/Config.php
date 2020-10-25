@@ -30,7 +30,7 @@ class Config
      * Email settings.
      * This may include credentials, name, provider.
      *
-     * @var [type]
+     * @var array
      */
     protected $settings;
 
@@ -171,8 +171,8 @@ class Config
 
     protected function loadProvider()
     {
-        if (isset($this->settings['provider']) && !empty($provider = $this->settings['provider'])) {
-            $this->provider = config('multimail.provider.' . $provider);
+        if (!empty($this->settings['provider'])) {
+            $this->provider = config('multimail.provider.' . $this->settings['provider']);
         }
 
         if (empty($this->provider)) {
@@ -202,7 +202,7 @@ class Config
 
         $this->loadProvider();
 
-        if ((!isset($this->provider['driver']) || $this->provider['driver'] != 'log') && (empty($this->settings) || empty($this->settings['pass']) || empty($this->settings['username']))) {
+        if ((!isset($this->provider['driver']) || $this->provider['driver'] != 'log') && (empty($this->settings['pass']) || empty($this->settings['username']))) {
             throw new Exceptions\NoDefaultException($this->email);
         }
     }
