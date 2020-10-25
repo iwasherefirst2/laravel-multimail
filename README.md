@@ -16,15 +16,17 @@ This package works for `SMTP` and `log` drivers.
     - [Basic Examples](#basic-examples)
     - [Queued Mails](#queued-mails)
     - [Specify in Mailable](#specify-in-mailable)
-    - [Multiple Mail Providers](#multiple-mail-providers)
     - [Bulk messages](#bulk-messages)
+- [Special Settings](#special-settings)
+    - [Multiple Mail Providers](#multiple-mail-providers)
     - [Default mailaccount](#default-mailaccount)
     - [Testing](#testing)
     - [Get Mail From Database](#get-mail-from-database)
+    - [Troubleshoot](#troubleshoot)
 
 ## Requirements
 
-Laravel 5 or higher
+Laravel 5, 6 or 7
 
 ## Installation
 
@@ -118,6 +120,23 @@ Mailable:
         return $this->markdown('emails.invitation')
                     ->subject('Invitation mail');
     }
+    
+    
+
+### Bulk messages
+
+For bulk messages, you may first require a mailer object. You can define a pause in seconds ($timeout) after a number of mails ($frequency) has been send.
+
+	$mailer = \MultiMail::getMailer('office@example.com' , $timeout, $frequency);
+
+Then you can iterate through your list.
+
+    foreach($users as $user){
+	$mailer->send(new \App\Mail\Invitation($user));
+    };
+
+
+## Special Settings
 
 ### Multiple Mail Providers
 
@@ -160,18 +179,6 @@ If you wish to send from mails with different provider, then you may create anot
     ],
 
 
-### Bulk messages
-
-For bulk messages, you may first require a mailer object. You can define a pause in seconds ($timeout) after a number of mails ($frequency) has been send.
-
-	$mailer = \MultiMail::getMailer('office@example.com' , $timeout, $frequency);
-
-Then you can iterate through your list.
-
-    foreach($users as $user){
-	$mailer->send(new \App\Mail\Invitation($user));
-    };
-
 
 ### Default mailaccount
 
@@ -199,7 +206,7 @@ You may provide `default` credentials inside the `email` array from `config/mult
 
 When `first_mail_password` and `first_mail_username` are empty, `office@example.net` will use credentials specified by `default`. This is useful for your local development, when you want to send all mails from one mailaccount while testing. This way you only need to specify `MAIL_PASSWORD` and `MAIL_USERNAME` locally.
 
-### Testing
+## Testing
 
 #### Don't put credentials in local `env`
 
@@ -248,3 +255,8 @@ For example:
 Notice that you do not need to specify `email` or `provider` in the config anymore.
 They should be loaded by your custom class `\App\MyCustomMailSettings::class`.
 
+## Troubleshoot
+
+#### Laravel 7 is not working
+
+Please update to version 1.2.2 to support Laravel 7
