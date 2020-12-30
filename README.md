@@ -23,6 +23,7 @@ This package works for `SMTP` and `log` drivers.
     - [Testing](#testing)
     - [Get Mail From Database](#get-mail-from-database)
     - [Troubleshoot](#troubleshoot)
+- [For Package Developer](#for-package-developer)    
 
 ## Requirements
 
@@ -260,3 +261,10 @@ They should be loaded by your custom class `\App\MyCustomMailSettings::class`.
 #### Laravel 7 is not working
 
 Please update to version 1.2.2 to support Laravel 7
+
+## For Package Developer
+
+If you plan to contribute to this package, please make sure that the unit tests aswell as the integration tests 
+all succeed. In order to test the integration tests please create a free mailtraip account, copy `tests/.env.example` 
+to `tests/.env` and add your mailtrap API credentials in `tests/.env`. The integration tests will now send 
+a test email to your mailtrap account and verify through the API if the mail was successfully send. 
