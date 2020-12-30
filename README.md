@@ -2,6 +2,8 @@
 
 ![Mail image](https://miro.medium.com/max/640/1*XAhO69eFPH6p32VlylUCaw.png)
 
+[![Build Status](https://travis-ci.com/iwasherefirst2/laravel-multimail.svg?branch=master)](https://travis-ci.com/iwasherefirst2/laravel-multimail)
+
 This package helps you to send mails from your Laravel application from multiple email accounts.
 
 The package supports sending queued, localized and bulk mails.
@@ -23,7 +25,7 @@ This package works for `SMTP` and `log` drivers.
     - [Testing](#testing)
     - [Get Mail From Database](#get-mail-from-database)
     - [Troubleshoot](#troubleshoot)
-- [For Package Developer](#for-package-developer)    
+- [For Package Developer](#for-package-developer)
 
 ## Requirements
 
