@@ -10,13 +10,11 @@ php:
 before_script:
   - composer self-update
   - composer install --prefer-dist --no-interaction
-  - pip install --user codecov
+
+script: ./vendor/bin/phpunit --coverage-clover clover.xml
 
 after_success:
-  - codecov --file coverage/lcov.info --disable search
   - bash <(curl -s https://codecov.io/bash)
-  
-script: ./vendor/bin/phpunit -d memory_limit=1024M
 
 matrix:
   fast_finish: true
