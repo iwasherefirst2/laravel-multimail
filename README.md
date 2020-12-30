@@ -3,6 +3,7 @@
 ![Mail image](https://miro.medium.com/max/640/1*XAhO69eFPH6p32VlylUCaw.png)
 
 [![Build Status](https://travis-ci.com/iwasherefirst2/laravel-multimail.svg?branch=master)](https://travis-ci.com/iwasherefirst2/laravel-multimail)
+[![codecov](https://codecov.io/gh/iwasherefirst2/laravel-multimail/branch/master/graph/badge.svg?token=3X6ZVRR5EQ)](https://codecov.io/gh/iwasherefirst2/laravel-multimail)
 
 This package helps you to send mails from your Laravel application from multiple email accounts.
 
