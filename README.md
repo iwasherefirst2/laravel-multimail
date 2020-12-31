@@ -271,3 +271,10 @@ If you plan to contribute to this package, please make sure that the unit tests 
 all succeed. In order to test the integration tests please create a free mailtraip account, copy `tests/.env.example` 
 to `tests/.env` and add your mailtrap API credentials in `tests/.env`. The integration tests will now send 
 a test email to your mailtrap account and verify through the API if the mail was successfully send. 
+
+The package ships with a Dockerfile to make it easy to run the tests for you. Simply follow these steps:
+
+    docker-compose up --build 
+    docker-compose exec app bash 
+    composer install
+    ./vendor/bin/phpunit 
