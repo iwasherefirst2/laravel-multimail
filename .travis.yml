@@ -1,7 +1,5 @@
 language: php
 
-dist: trusty
-
 php:
   - 7.2
   - 7.3
@@ -16,5 +14,8 @@ script: ./vendor/bin/phpunit --coverage-clover clover.xml
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
-matrix:
-  fast_finish: true
+# Only runs tests on master or PR to master branch
+branches:
+  only:
+    - "master"
+
