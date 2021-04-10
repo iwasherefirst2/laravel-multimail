@@ -23,7 +23,7 @@ class MultiMailServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->bind('iwasherefirst2-laravelmultimail', function () {
-            if(config()->has('multimail.config_class')){
+            if(config()->has('multimail.mail_settings_class')){
                 $configClass = config('multimail.mail_settings_class');
                 $config = new $configClass();
             }
@@ -36,6 +36,11 @@ class MultiMailServiceProvider extends ServiceProvider
 
         $this->publishes([
             dirname(__DIR__) . '/publishable/config/multimail.php' => config_path('multimail.php'),
-        ]);
+        ], 'config');
+
+
+        $this->publishes([
+            __DIR__.'/Migrations/' => database_path('migrations')
+        ], 'migrations');
     }
 }

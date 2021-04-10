@@ -40,7 +40,7 @@ Install the package into your Laraval application with composer:
 
 Publish the config file:
 
-    php artisan vendor:publish --provider="IWasHereFirst2\LaravelMultiMail\MultiMailServiceProvider"
+    php artisan vendor:publish --provider="IWasHereFirst2\LaravelMultiMail\MultiMailServiceProvider" --tag=config
 
 Configure your email clients in `config/multimail.php`:
 
@@ -234,30 +234,31 @@ in your config file `config/multimail.php`. Note that `assertQueued` will never 
 ### Get Mail From Database
 
 If you want to load your mail account configuration from database
-or anything else, just create a class that implements `\IWasHereFirst2\LaravelMultiMail\MailSettings`
-and specify the class in `config/multimail.php` under the key `mail_settings_class`.
+publish the package migrations:
 
-For example:
+    php artisan vendor:publish --provider="IWasHereFirst2\LaravelMultiMail\MultiMailServiceProvider" --tag=migrations
+
+In your migration folder are now two tabels, email_accounts and email_providers
+
+Instead of adding emails to the config they should be added to the table email_accounts.
+
+Make sure to update your config `config/multimail.php`:
 
     <?php
     
     return [
-        /*
-        |--------------------------------------------------------------------------
-        | List your email providers
-        |--------------------------------------------------------------------------
-        |
-        | Enjoy a life with multimail
-        |
-        */
-        'use_default_mail_facade_in_tests' => true,
-    
-        'mail_settings_class' => \App\MyCustomMailSettings::class,
-    
+        
+        'mail_settings_class' => \IWasHereFirst2\LaravelMultiMail\DatabaseConfigMailSettings::class,
+
+        //...
     ];
-    
-Notice that you do not need to specify `email` or `provider` in the config anymore.
-They should be loaded by your custom class `\App\MyCustomMailSettings::class`.
+
+The emails will now be read from the database instead from the configuration file.
+If no provider is provided in email_accounts (column provider is nullable),
+then the default profider from `config/multimail.php` will be considerd.
+
+If you want to make customizations, copy the class `\IWasHereFirst2\LaravelMultiMail\DatabaseConfigMailSettings`
+somewhere in your application, adjust the namespace, and update the reference `mail_settings_class` in your config file.
 
 ## Troubleshoot
 

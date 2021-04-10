@@ -3,10 +3,16 @@
 
 namespace IWasHereFirst2\LaravelMultiMail;
 
-use \IWasHereFirst2\LaravelMultiMail\MailSettings;
 
-class FileConfigMailSettings implements MailSettings
+use \IWasHereFirst2\LaravelMultiMail\MailSettings;
+use IWasHereFirst2\LaravelMultiMail\Models\EmailAccount;
+
+class DatabaseConfigMailSettings implements MailSettings
 {
+    private $account;
+
+    private $provider;
+
     /**
      * Name from mail sender.
      *
@@ -22,12 +28,6 @@ class FileConfigMailSettings implements MailSettings
      */
     private $email;
 
-    /**
-     * Driver, Host, Port & Encryption.
-     *
-     * @var array
-     */
-    private $provider;
 
     /**
      * Email settings.
@@ -37,18 +37,18 @@ class FileConfigMailSettings implements MailSettings
      */
     private $settings;
 
-    public function initialize($key)
+    public function initialize($key): DatabaseConfigMailSettings
     {
         $this->parseEmail($key);
 
         try {
-            $this->settings   = config('multimail.emails')[$this->email];
+            $this->account   = EmailAccount::where('email', '=', $this->email)->firstOrFail();
         } catch (\Exception $e) {
             throw new Exceptions\EmailNotInConfigException($this->email);
         }
 
         if (empty($this->name)) {
-            $this->name = $this->settings['from_name'] ?? null;
+            $this->name = $this->account->from_mail;
         }
 
         $this->loadProvider();
@@ -89,7 +89,7 @@ class FileConfigMailSettings implements MailSettings
      */
     public function getSetting()
     {
-        return $this->settings;
+        return $this->account->toArray();
     }
 
     /**
@@ -99,7 +99,7 @@ class FileConfigMailSettings implements MailSettings
      */
     public function getFromEmail()
     {
-        return $this->settings['from_mail'] ?? $this->email;
+        return $this->account->from_mail ?? $this->email;
     }
 
     /**
@@ -119,7 +119,7 @@ class FileConfigMailSettings implements MailSettings
      */
     public function getReplyEmail()
     {
-        return $this->settings['reply_to_mail'] ?? null;
+        return $this->account->reply_to_mail;
     }
 
     /**
@@ -129,7 +129,7 @@ class FileConfigMailSettings implements MailSettings
      */
     public function getReplyName()
     {
-        return $this->settings['reply_to_name'] ?? null;
+        return $this->account->reply_to_name;
     }
 
     public function getEmail()
@@ -144,7 +144,7 @@ class FileConfigMailSettings implements MailSettings
      */
     private function isEmpty()
     {
-        return (empty($this->email) || empty($this->settings) || empty($this->settings['pass']) || empty($this->settings['username']));
+        return (empty($this->email) || empty($this->account) || empty($this->account->pass) || empty($this->account->username));
     }
 
     /**
@@ -155,11 +155,11 @@ class FileConfigMailSettings implements MailSettings
      */
     private function loadDefault()
     {
-        $this->settings = config('multimail.emails.default');
+        $this->account = (object) config('multimail.emails.default');
 
         $this->loadProvider();
 
-        if ((!isset($this->provider['driver']) || $this->provider['driver'] != 'log') && (empty($this->settings['pass']) || empty($this->settings['username']))) {
+        if ((!isset($this->provider['driver']) || $this->provider['driver'] != 'log') && (empty($this->acount->pass) || empty($this->account->username))) {
             throw new Exceptions\NoDefaultException($this->email);
         }
     }
@@ -189,12 +189,14 @@ class FileConfigMailSettings implements MailSettings
 
     private function loadProvider()
     {
-        if (!empty($this->settings['provider'])) {
-            $this->provider = config('multimail.provider.' . $this->settings['provider']);
+
+        if (!empty($this->account->provider)) {
+            $this->provider = $this->account->provider->toArray();
         }
 
         if (empty($this->provider)) {
             $this->provider = config('multimail.provider.default');
         }
     }
+
 }
