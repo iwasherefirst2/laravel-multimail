@@ -95,7 +95,7 @@ class MultiMailer
         if (\App::runningUnitTests() && config('multimail.use_default_mail_facade_in_tests')) {
             return \Mail::send($mailable);
         }
-      
+
         if (empty($mailer_name)) {
             return \Mail::send($mailable);
         }
@@ -141,7 +141,8 @@ class MultiMailer
         if (empty($mailer_name)) {
             return \Mail::queue($mailable);
         }
-        Jobs\SendMailJob::dispatch($mailer_name, $mailable);
+
+        Jobs\SendMailJob::dispatch($mailer_name, $mailable)->onQueue($mailable->queue ?? null);
     }
 
     /**
