@@ -95,8 +95,6 @@ class MultiMailTest extends TestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-
-        // Setup default database to use sqlite :memory:
         $app['config']->set('multimail.emails',
         ['test@fake.de' => [
             'pass'          => 'fakepass',
