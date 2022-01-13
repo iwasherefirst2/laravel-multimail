@@ -15,7 +15,6 @@ class SMPTTest extends TestCase
 
     const FROM = 'smtp@fake.de';
 
-    /** @test */
     public function check_if_smtp_mail_is_sendable()
     {
         $to     = 'test@bar.com';
