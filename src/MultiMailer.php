@@ -48,7 +48,7 @@ class MultiMailer
      * @param  int frequency
      * @return \Illuminate\Mail\Mailer
      */
-    public function getMailer($key, $timeout = null, $frequency = null)
+    public function getMailer($key, $timeout = null, $frequency = null, $fromName = null)
     {
         $config = $this->config->initialize($key);
 
@@ -66,14 +66,14 @@ class MultiMailer
 
         $view   = app()->get('view');
         $events = app()->get('events');
-        $mailer = null;
+
         if (version_compare(app()->version(), '7.0.0') >= 0) {
             $mailer = new Mailer(config('app.name'), $view, $swift_mailer, $events);
         } else {
             $mailer = new Mailer($view, $swift_mailer, $events);
         }
 
-        $mailer->alwaysFrom($config->getFromEmail(), $config->getFromName());
+        $mailer->alwaysFrom($config->getFromEmail(), $fromName ?? $config->getFromName());
 
         if (!empty($reply_mail = $config->getReplyEmail())) {
             $mailer->alwaysReplyTo($reply_mail, $config->getReplyEmail());
@@ -90,7 +90,7 @@ class MultiMailer
      * @param  [type]           $mailer_name ]
      * @return [type]                        [description]
      */
-    public function sendMail(MailableContract $mailable, $mailer_name)
+    public function sendMail(MailableContract $mailable, $mailer_name, $fromName)
     {
         if (\App::runningUnitTests() && config('multimail.use_default_mail_facade_in_tests')) {
             return \Mail::send($mailable);
@@ -99,7 +99,7 @@ class MultiMailer
         if (empty($mailer_name)) {
             return \Mail::send($mailable);
         }
-        $mailer = $this->getMailer($mailer_name);
+        $mailer = $this->getMailer($mailer_name, null, null, $fromName);
 
         $mailable->send($mailer);
     }
@@ -162,9 +162,9 @@ class MultiMailer
      * @param  mixed  $users
      * @return \IWasHereFirst2\MultiMail\PendingMail
      */
-    public function from($name)
+    public function from(string $mailerKey, $fromName = null)
     {
-        return (new PendingMail())->from($name);
+        return (new PendingMail())->from($mailerKey, $fromName);
     }
 
     /**

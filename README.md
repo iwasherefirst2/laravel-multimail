@@ -71,7 +71,8 @@ Attribut | Functionality | required
 
 One may send a mail using `\MultiMail` instead of `\Mail`. The methods `to`, `cc`, `bcc`, `locale` are exactly the same as provided by the [mail facade](https://laravel.com/docs/5.8/mail#sending-mail) (note that `locale` is only available since Laravel 5.6).
 
-The `from` method from `MultiMail` needs a string of an email provided in `config/multimail.php`. When using `send` or `queue` the mail will be send from the mail account specified in `cofing/multimail.php`.
+The `from` method from `MultiMail` needs a string of an email provided in `config/multimail.php`. You can pass optionaly a second parameter as from name instetad of using the default falue given in the config.
+When using `send` or `queue` the mail will be send from the mail account specified in `cofing/multimail.php`.
 
 ### Basic Examples
 
