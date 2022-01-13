@@ -135,14 +135,14 @@ class MultiMailer
         return $this->plugins;
     }
 
-    public function queueMail(MailableContract $mailable, $mailer_name)
+    public function queueMail(MailableContract $mailable, $mailer_name, $fromName)
     {
         // no mailer given, use default mailer
         if (empty($mailer_name)) {
             return \Mail::queue($mailable);
         }
 
-        Jobs\SendMailJob::dispatch($mailer_name, $mailable)->onQueue($mailable->queue ?? null);
+        Jobs\SendMailJob::dispatch($mailer_name, $mailable, $fromName)->onQueue($mailable->queue ?? null);
     }
 
     /**
