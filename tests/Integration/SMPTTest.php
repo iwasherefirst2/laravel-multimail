@@ -15,15 +15,17 @@ class SMPTTest extends TestCase
 
     const FROM = 'smtp@fake.de';
 
+    /** @test */
     public function check_if_smtp_mail_is_sendable()
     {
         $to     = 'test@bar.com';
         $locale = 'de';
         $from   = static::FROM;
+
         MultiMail::to($to)
-                              ->locale($locale)
-                              ->from($from)
-                              ->send(new TestMail());
+            ->locale($locale)
+            ->from($from)
+            ->send(new TestMail());
 
         $this->assertTrue($this->messageExists('TestMail Subject'));
 

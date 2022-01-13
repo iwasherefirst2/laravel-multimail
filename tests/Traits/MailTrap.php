@@ -187,11 +187,22 @@ trait MailTrap
             $this->applyMailTrapConfiguration();
         }
 
-        $body = $this->requestClient()
-            ->get($this->searchInboxMessagesUrl($query))
-            ->getBody();
+        $counter = 0;
 
-        return $this->parseJson($body);
+        do{
+            $body = $this->requestClient()
+                ->get($this->searchInboxMessagesUrl($query))
+                ->getBody();
+
+            $body = $this->parseJson($body);
+            $counter++;
+
+            if($counter >= 50){
+                return $body;
+            }
+        }while(empty($body));
+
+        return $body;
     }
 
     /**
