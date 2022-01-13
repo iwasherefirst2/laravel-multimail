@@ -1,6 +1,9 @@
 # PHP CircleCI 2.0 configuration file
 # See: https://circleci.com/docs/2.0/language-php/
-version: 2
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@1.0.2
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
@@ -45,4 +48,14 @@ jobs:
             - ./vendor
 
       # run tests with phpunit or codecept
-      - run: ./vendor/bin/phpunit
+      #- run: ./vendor/bin/phpunit
+
+      - run:
+          name: "Run tests"
+          command: phpdbg -qrr vendor/bin/phpunit --coverage-html build/coverage-report
+      - store_artifacts:
+          path: build/coverage-report
+      - codecov/upload:
+          file: build/coverage-report
+
+
