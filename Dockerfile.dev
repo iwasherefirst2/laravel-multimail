@@ -16,6 +16,13 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     -y mariadb-client
 
+# Install and enable xdebug (for generating PHPUnit Test Coverage Report)
+#
+# ADVICE: Enabling XDebug renders PHP script execution slower
+#
+RUN pecl install xdebug-2.9.8 \
+    && docker-php-ext-enable xdebug
+
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 

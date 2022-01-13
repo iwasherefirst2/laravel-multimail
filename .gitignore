@@ -5,3 +5,4 @@ composer.lock
 tests/_report
 .env
 .idea
+/html
