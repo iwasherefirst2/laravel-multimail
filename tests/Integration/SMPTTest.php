@@ -32,6 +32,40 @@ class SMPTTest extends TestCase
     }
 
     /** @test */
+    public function check_smtp_mail_from_name()
+    {
+        $to     = 'test@bar.com';
+        $locale = 'de';
+        $from   = static::FROM;
+        MultiMail::to($to)
+            ->locale($locale)
+            ->from($from)
+            ->send(new TestMail());
+
+        $message = $this->findMessage('TestMail Subject');
+
+        $this->assertEquals('Adam Nielsen', $message[0]['from_name']);
+        $this->emptyInbox();
+    }
+
+    /** @test */
+    public function check_if_smtp_mail_can_configure_from()
+    {
+        $to     = 'test@bar.com';
+        $locale = 'de';
+        $from   = static::FROM;
+        MultiMail::to($to)
+            ->locale($locale)
+            ->from($from, 'Backarony Mockoli')
+            ->send(new TestMail());
+
+        $message = $this->findMessage('TestMail Subject');
+
+        $this->assertEquals('Backarony Mockoli', $message[0]['from_name']);
+        $this->emptyInbox();
+    }
+
+    /** @test */
     public function get_mailer_with_antifloodplugin()
     {
         $mailer = MultiMail::getMailer(static::FROM, 1, 1);
@@ -57,7 +91,7 @@ class SMPTTest extends TestCase
         ['smtp@fake.de' => [
             'pass'     => env('MAIL_PASSWORD_SMTP'),
             'username' => env('MAIL_USERNAME_SMTP'),
-            'from'     => 'Adam Nielsen',
+            'from_name'     => 'Adam Nielsen',
             'provider' => 'smtp',
         ]]);
 

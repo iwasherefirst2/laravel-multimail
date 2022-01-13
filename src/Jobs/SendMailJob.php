@@ -14,18 +14,19 @@ class SendMailJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $mailer_name;
-
     protected $mailable;
+    protected $fromName;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($mailer_name, $mailable)
+    public function __construct($mailer_name, $mailable, $fromName)
     {
         $this->mailer_name       = $mailer_name;
         $this->mailable          = $mailable;
+        $this->fromName          = $fromName;
     }
 
     /**
@@ -35,6 +36,6 @@ class SendMailJob implements ShouldQueue
      */
     public function handle()
     {
-        MultiMail::sendMail($this->mailable, $this->mailer_name);
+        MultiMail::sendMail($this->mailable, $this->mailer_name, $this->fromName);
     }
 }

@@ -44,6 +44,13 @@ class PendingMail
     protected $bcc = [];
 
     /**
+     * Overrwrites name of from mail cofnig
+     *
+     * @var ?string
+     */
+    protected $fromName = null;
+
+    /**
      * Set the locale of the message.
      *
      * @param  string  $locale
@@ -75,9 +82,10 @@ class PendingMail
      * @param  string  mailer name
      * @return $this
      */
-    public function from($mailer)
+    public function from($mailerKey, $fromName = null)
     {
-        $this->fromMailer = $mailer;
+        $this->fromName = $fromName;
+        $this->fromMailer = $mailerKey;
 
         return $this;
     }
@@ -133,7 +141,7 @@ class PendingMail
     {
         $mailer = $this->fromMailer ?? optional($mailable)->fromMailer;
 
-        return MultiMail::sendMail($this->fill($mailable), $mailer);
+        return MultiMail::sendMail($this->fill($mailable), $mailer, $this->fromName);
     }
 
     /**
@@ -146,7 +154,7 @@ class PendingMail
     {
         $mailer = $this->fromMailer ?? optional($mailable)->fromMailer;
 
-        return MultiMail::queueMail($this->fill($mailable), $mailer);
+        return MultiMail::queueMail($this->fill($mailable), $mailer, $this->fromName);
     }
 
     /**
