@@ -48,7 +48,7 @@ class DatabaseConfigMailSettings implements MailSettings
         }
 
         if (empty($this->name)) {
-            $this->name = $this->account->from_mail;
+            $this->name = $this->account->from_name;
         }
 
         $this->loadProvider();

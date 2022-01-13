@@ -18,6 +18,7 @@ class CreateEmailProvidersTable extends Migration
             $table->string('host');
             $table->string('port');
             $table->string('encryption');
+            $table->string('driver')->default('smtp');
             $table->timestamps();
         });
     }

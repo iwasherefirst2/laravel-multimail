@@ -2,51 +2,58 @@
 
 namespace IWasHereFirst2\LaravelMultiMail\Tests\Integration;
 
+use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Support\Facades\View;
+use IWasHereFirst2\LaravelMultiMail\DatabaseConfigMailSettings;
 use IWasHereFirst2\LaravelMultiMail\Facades\MultiMail;
 use IWasHereFirst2\LaravelMultiMail\Models\EmailAccount;
+use IWasHereFirst2\LaravelMultiMail\Models\EmailProvider;
 use IWasHereFirst2\LaravelMultiMail\Tests\TestCase;
+use IWasHereFirst2\LaravelMultiMail\Tests\Traits\MailTrap;
 
 class MultiMailDatabaseTest extends TestCase
 {
-    const FROM = 'test@fake.de';
+    use MailTrap;
+    const FROM = 'ronyPuh@foo.com';
 
     /** @test */
     public function check_database_email()
     {
-        $this->artisan(
-            'migrate',
-            [
-                '--database' => 'testbench',
-                '--realpath' => realpath(__DIR__ . '/../../src/Migrations'),
-            ]
-        )->run();
+        $this->loadMigrationsFrom(realpath(__DIR__ . '/../../src/Migrations'));
 
-        dd( \DB::table('email_accounts')->get());
+        $this->artisan('migrate',['--database' => 'testbench'])
+            ->run();
 
-        EmailAccount::create([
-            'email' => 'ronyPuh',
-            'pass' => 'gomyBore',
+        $provider = EmailProvider::create([
+            'host'        => env('MAIL_HOST_SMTP'),
+            'port'        => env('MAIL_PORT_SMTP'),
+            'encryption'  => env('MAIL_ENCRYPTION_SMTP'),
+            'driver'      => env('MAIL_DRIVER_SMTP'),
         ]);
 
-        dd(EmailAccount::all());
+        EmailAccount::create([
+            'email' => static::FROM,
+            'pass'     => env('MAIL_PASSWORD_SMTP'),
+            'username' => env('MAIL_USERNAME_SMTP'),
+            'from_name'     => 'Rayn Roogen',
+            'provider_id' => $provider->id
+        ]);
 
-
-        $to     = 'test@bar.com';
-        $cc     = 'foo@bar.ur';
+        $to     = 'foo-fighter@foo.com';
         $locale = 'de';
         $from   = static::FROM;
         $bcc    = ['oki@foo.berlin', 'rooky@mooky.de'];
 
         MultiMail::to($to)
-            ->cc($cc)
             ->locale($locale)
             ->from($from)
             ->bcc($bcc)
             ->send(new TestMail());
 
-        $this->assertNotNull($this->emails);
-        $this->assertEquals(1, count($this->emails));
+        $message = $this->findMessage('TestMail Subject');
+
+        $this->assertEquals('Rayn Roogen', $message[0]['from_name']);
+        $this->emptyInbox();
     }
 
     /**
@@ -65,13 +72,11 @@ class MultiMailDatabaseTest extends TestCase
             'prefix'   => '',
         ]);
 
-        $app['config']->set('multimail.emails',
-            ['test@fake.de' => [
-                'pass'          => 'fakepass',
-                'username'      => 'fakeusername',
-                'from'          => 'Who knows',
-                'reply_to_mail' => 'bs@web.de',
-            ]]);
+        $app->useEnvironmentPath(__DIR__ . '/..');
+        $app->bootstrapWith([LoadEnvironmentVariables::class]);
+
+        $app['config']->set('multimail.mail_settings_class',
+            DatabaseConfigMailSettings::class);
 
         $app['config']->set('multimail.provider.default', [
             'driver'   => 'log',
@@ -81,6 +86,4 @@ class MultiMailDatabaseTest extends TestCase
 
         View::addLocation(__DIR__ . '/../Fixtures');
     }
-
-
 }
