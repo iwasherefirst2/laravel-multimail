@@ -22,7 +22,7 @@ class TransportManager
 
         $transport_factory = new EsmtpTransportFactory;
         $transport = $transport_factory->create(new Dsn(
-           config('mail.mailers.smtp.encryption') == 'tls' ? 'smtps' : 'smtp',
+            'smtp',
             $provider['host'],
             $setting['username'],
             $setting['pass'],
