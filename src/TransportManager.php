@@ -4,8 +4,8 @@ namespace IWasHereFirst2\LaravelMultiMail;
 
 use Illuminate\Mail\Transport\LogTransport;
 use Psr\Log\LoggerInterface;
-use \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
-use  \Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
+use Symfony\Component\Mailer\Transport\Dsn;
 
 class TransportManager
 {
