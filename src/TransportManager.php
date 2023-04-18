@@ -4,7 +4,8 @@ namespace IWasHereFirst2\LaravelMultiMail;
 
 use Illuminate\Mail\Transport\LogTransport;
 use Psr\Log\LoggerInterface;
-use Swift_SmtpTransport;
+use \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
+use  \Symfony\Component\Mailer\Transport\Dsn;
 
 class TransportManager
 {
@@ -12,16 +13,21 @@ class TransportManager
      * Create SMTP Transport.
      *
      * @param  array
-     * @return Swift_SmtpTransport
+     * @return Dsn
      */
     public static function createSmtpDriver($config)
     {
         $provider = $config->getProvider();
         $setting  = $config->getSetting();
 
-        $transport = new Swift_SmtpTransport($provider['host'], $provider['port'], $provider['encryption']);
-        $transport->setUsername($setting['username'] ?? $config->getEmail());
-        $transport->setPassword($setting['pass']);
+        $transport_factory = new EsmtpTransportFactory;
+        $transport = $transport_factory->create(new Dsn(
+           config('mail.mailers.smtp.encryption') == 'tls' ? 'smtps' : 'smtp',
+            $provider['host'],
+            $setting['username'],
+            $setting['pass'],
+            $provider['port']
+        ));
 
         return self::configureSmtpDriver($transport, $provider);
     }
@@ -29,9 +35,9 @@ class TransportManager
     /**
      * Configure the additional SMTP driver options.
      *
-     * @param  \Swift_SmtpTransport  $transport
+     * @param  EsmtpTransportFactory  $transport
      * @param  array  $config
-     * @return \Swift_SmtpTransport
+     * @return EsmtpTransportFactory
      */
     protected static function configureSmtpDriver($transport, $config)
     {
