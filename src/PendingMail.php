@@ -50,6 +50,11 @@ class PendingMail
      */
     protected $fromName = null;
 
+    public function __construct(private readonly MultiMailer $multiMailer)
+    {
+    }
+
+
     /**
      * Set the locale of the message.
      *
@@ -141,7 +146,7 @@ class PendingMail
     {
         $mailer = $this->fromMailer ?? optional($mailable)->fromMailer;
 
-        return MultiMail::sendMail($this->fill($mailable), $mailer, $this->fromName);
+        return $this->multiMailer->sendMail($this->fill($mailable), $mailer, $this->fromName);
     }
 
     /**
@@ -154,7 +159,7 @@ class PendingMail
     {
         $mailer = $this->fromMailer ?? optional($mailable)->fromMailer;
 
-        return MultiMail::queueMail($this->fill($mailable), $mailer, $this->fromName);
+        return $this->multiMailer->queueMail($this->fill($mailable), $mailer, $this->fromName);
     }
 
     /**

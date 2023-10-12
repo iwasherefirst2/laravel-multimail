@@ -151,7 +151,7 @@ class MultiMailer
      */
     public function to($users)
     {
-        return (new PendingMail())->to($users);
+        return (new PendingMail($this))->to($users);
     }
 
     /**
@@ -162,7 +162,7 @@ class MultiMailer
      */
     public function from(string $mailerKey, $fromName = null)
     {
-        return (new PendingMail())->from($mailerKey, $fromName);
+        return (new PendingMail($this))->from($mailerKey, $fromName);
     }
 
     /**
@@ -173,7 +173,7 @@ class MultiMailer
      */
     public function cc($users)
     {
-        return (new PendingMail())->cc($users);
+        return (new PendingMail($this))->cc($users);
     }
 
     /**
@@ -184,7 +184,7 @@ class MultiMailer
      */
     public function bcc($users)
     {
-        return (new PendingMail())->bcc($users);
+        return (new PendingMail($this))->bcc($users);
     }
 
     /**
@@ -195,7 +195,7 @@ class MultiMailer
      */
     public function locale($locale)
     {
-        return (new PendingMail())->locale($locale);
+        return (new PendingMail($this))->locale($locale);
     }
 
     /**
@@ -206,7 +206,7 @@ class MultiMailer
      */
     public function send(Mailable $mailable)
     {
-        return (new PendingMail())->send($mailable);
+        return (new PendingMail($this))->send($mailable);
     }
 
     /**
@@ -217,7 +217,7 @@ class MultiMailer
      */
     public function queue(Mailable $mailable)
     {
-        return (new PendingMail())->queue($mailable);
+        return (new PendingMail($this))->queue($mailable);
     }
 
     /**
