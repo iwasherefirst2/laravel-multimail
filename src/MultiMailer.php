@@ -65,11 +65,7 @@ class MultiMailer
         $view   = app()->get('view');
         $events = app()->get('events');
 
-        if (version_compare(app()->version(), '7.0.0') >= 0) {
-            $mailer = new Mailer(config('app.name'), $view, $symphony_mailer, $events);
-        } else {
-            $mailer = new Mailer($view, $symphony_mailer, $events);
-        }
+        $mailer = new Mailer(config('app.name'), $view, $symphony_mailer, $events);
 
         $mailer->alwaysFrom($config->getFromEmail(), $fromName ?? $config->getFromName());
 
