@@ -25,7 +25,7 @@ class FileConfigMailSettings implements MailSettings
             return $config['emails'][$this->identifier]['driver'];
         }
 
-        $driver = $this->getDefaultDriver();
+        $driver = $this->defaultLaravelMailDriver->getDefaultDriver();
 
         if (empty($driver)) {
             throw new \Exception('No driver name specified');
@@ -36,29 +36,7 @@ class FileConfigMailSettings implements MailSettings
 
     public function getDriver(): array
     {
-        $config = $this->getMultiMailConfig();
-
-        // Backwards compatibility for MultiMail 1.* config
-        if (!empty($config['emails'][$this->identifier]['driver'])) {
-            $driver = $config['emails'][$this->identifier]['driver'];
-
-            if (!empty($config['provider'][$driver])) {
-                return $config['provider'][$driver];
-            }
-        }
-
-        // Backwards compatibility for MultiMail 1.* config
-        if (!empty($config['provider']['default'])) {
-            return $config['provider']['default'];
-        }
-
-        if (!isset($driver)) {
-            $driver = $this->defaultLaravelMailDriver->getDefaultDriver();
-        }
-
-        if ($driver === null) {
-            throw new InvalidConfigKeyException('No mail driver found');
-        }
+        $driver = $this->getMailDriverName();
 
         $laravelConfig = $this->defaultLaravelMailDriver->getLaravelConfig($driver);
 
@@ -69,14 +47,35 @@ class FileConfigMailSettings implements MailSettings
         return $laravelConfig;
     }
 
+    private function getMailDriverName(): string
+    {
+        $config = $this->getMultiMailConfig();
+        if (!empty($config['emails'][$this->identifier]['driver'])) {
+            return $config['emails'][$this->identifier]['driver'];
+        }
+
+        $driver = $this->defaultLaravelMailDriver->getDefaultDriver();
+        if ($driver === null) {
+            throw new InvalidConfigKeyException('No mail driver found');
+        }
+        return $driver;
+    }
+
     public function getFromName(): string|null
     {
         return $this->getNullOrKey('from_name');
     }
 
-    public function getReplyTo(): string|null
+    public function getReplyTo(): array|null
     {
-        return $this->getNullOrKey('reply_to');
+        $address =  $this->getNullOrKey('reply_to_mail');
+        $name =  $this->getNullOrKey('reply_to_name');
+
+        if ($address === null && $name === null) {
+            return null;
+        }
+
+        return compact(['address', 'name']);
     }
 
     public function getReturnPath(): string|null

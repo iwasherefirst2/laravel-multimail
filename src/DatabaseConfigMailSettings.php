@@ -18,7 +18,7 @@ class DatabaseConfigMailSettings implements MailSettings
         try {
             $this->account   = EmailAccount::where('email', '=', $key)->firstOrFail();
         } catch (\Exception $e) {
-            throw new Exceptions\EmailNotInConfigException($this->email);
+            throw new Exceptions\EmailNotInConfigException($key);
         }
 
         $this->loadProvider();
@@ -36,18 +36,12 @@ class DatabaseConfigMailSettings implements MailSettings
             return;
         }
 
-        $this->provider = config('multimail.provider.default');
-
-        if (!empty($this->provider)) {
-            return;
-        }
-
         $this->provider = $this->defaultLaravelMailDriver->getDefaultLaravelConfig();
     }
 
     public function getFromName(): string|null
     {
-        $this->account->from_name;
+        return $this->account->from_name;
     }
 
     public function getReplyTo(): array|null
