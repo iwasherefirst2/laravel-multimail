@@ -1,5 +1,5 @@
 {
-    "name": "iwasherefirst2/laravel-multimail",
+    "name": "dokicro/laravel-multimail",
     "description": "A package to send mails easily from multiple mail accounts with Laravel",
     "keywords": ["multiple providers", "laravel", "emails"],
     "license": "MIT",
