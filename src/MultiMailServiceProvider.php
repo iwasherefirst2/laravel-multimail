@@ -22,7 +22,7 @@ class MultiMailServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app->bind('iwasherefirst2-laravelmultimail', function () {
+        $this->app->bind(MultiMailer::class, function () {
             if(config()->has('multimail.mail_settings_class')){
                 $configClass = config('multimail.mail_settings_class');
                 $config = new $configClass();
