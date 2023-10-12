@@ -30,7 +30,8 @@ This package works for `SMTP` and `log` drivers.
 
 ## Requirements
 
-Laravel 5, 6 or 7
+Laravel 5, 6,7 or 8. 
+Larave 9 and 10 are not supported.
 
 ## Installation
 

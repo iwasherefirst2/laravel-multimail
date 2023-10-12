@@ -10,6 +10,9 @@
             "email": "info@drnielsen.de"
         }
     ],
+    "require": {
+        "laravel/framework": "^5.0|^6.0|^7.0|^8.0",
+    },
     "require-dev": {
         "orchestra/testbench": "^4.0",
         "guzzlehttp/guzzle": "^6.4"
