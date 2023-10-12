@@ -7,13 +7,21 @@
 
 This package helps you to send mails from your Laravel application from multiple email accounts.
 
-The package supports sending queued, localized and bulk mails.
+This package works for all mail drivers supported by [Laravel 9](https://laravel.com/docs/9.x/mail#driver-prerequisites) or [Laravel 10](https://laravel.com/docs/10.x/mail#driver-prerequisites).
+Queued mails work aswell.
 
-This package works for `SMTP` and `log` drivers.
+## Table of Contents
 
----
-## PLEASE CHECK IF YOU EVEN NEED THE PACKAGE <a name="check-package"></a>
+- [Do I need this Package](#do-i-need-this-package)
+- [Requirments](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Upgrade guide from 1.* to 2.*](#upgrade-guide-from-1-to-2) 
+- [Get Mail From Database](#get-mail-from-database)
+- [Testing](#testing) 
+- [For Package Developer](#for-package-developer)
 
+## Do I need this Package
 Since [Laravel 7](https://laravel.com/docs/7.x/upgrade) you can define multiple mail driver
 and specify the mailer on the [Mail facade](https://laravel.com/docs/7.x/mail#sending-mail):
 
@@ -25,27 +33,22 @@ Mail::mailer('postmark')
 
 The `from` mail address can be defined globally or for each mailable: https://laravel.com/docs/7.x/mail#configuring-the-sender
 
-Those two options combined allow you to send from multiple mail accounts.
-So for most use-cases, this package is probably no longer needed.
+The difference to MultiMail is, that in MultiMail you specify the mail driver to an email. So it would look like this:
 
----
+``` 
+MultiMail::from('info@example.com')
+        ->to($request->user())
+        ->send(new OrderShipped($order));
+```
 
-## Table of Contents
+You don't need to specify the "from" email in the Mailable.
 
-- [Requirments](#requirements)
-- [Installation](#installation)
-- [Usage](#usage)
-    - [Basic Examples](#basic-examples)
-    - [Queued Mails](#queued-mails)
-    - [Specify in Mailable](#specify-in-mailable)
-    - [Bulk messages](#bulk-messages)
-- [Special Settings](#special-settings)
-    - [Multiple Mail Providers](#multiple-mail-providers)
-    - [Default mailaccount](#default-mailaccount)
-    - [Testing](#testing)
-    - [Get Mail From Database](#get-mail-from-database)
-    - [Troubleshoot](#troubleshoot)
-- [For Package Developer](#for-package-developer)
+
+Thus, I can only think of three cases where the current package could be useful for you:
+
+- You need support to send mails from multiple accounts for a Laravel 5 or 6 application. Then please follow manual for [Multimail 1.3.7](https://github.com/iwasherefirst2/laravel-multimail/tree/1.3.7)
+- You want to send mails from mailaccouns that are stored in a database
+- You don't want to define the "from" email in the Mailable
 
 ## Requirements
 
@@ -54,10 +57,9 @@ So for most use-cases, this package is probably no longer needed.
 | 5,6,7,8         | 1.3.7             |
 | 9, 10           | 2.*               |
 
+These are the instructions for MultiMail 2.*.
+If you want to install MultiMail 1.3.7, please refer to the [MultiMail 1.3.7 Readme](https://github.com/iwasherefirst2/laravel-multimail/tree/1.3.7).
 
-Please [check](#check-package) if you even need this package.
-Since version 7, sending from multiple accounts is possible 
-by Laravel core.
 
 ## Installation
 
@@ -74,192 +76,47 @@ Configure your email clients in `config/multimail.php`:
     'emails'  => [
         'office@example.net' =>
             [
-              'pass'     => env('first_mail_password'),
               'from_name'     => "Max Musterman",
             ],
         'contact@example.net'  =>
             [
-              'pass'     => env('second_mail_password')
+                'driver' => 'smtp',
+                'from_name' => 'Karl Peter'
             ],
     ],
 
-Make sure to put your credentials in the `.env` file, so they don't get tracked in your repository.
+For each mail you may specify multiple columns (no fields are required, you can also have an empty array):
 
-For each mail you may specify multiple columns:
-
-Attribut | Functionality | required
---- | --- | ---
-`pass` | Password of email account | yes
-`username` | Username of email account, only neccessary if different from email address | no
-`from_name` | Name that should appear in front of email | no
-`provider` | Provider of email account, only necessary if mail host/encription/port is not default (see [here](#multiple-mail-providers) for more) | no
+| Attribut        | Functionality                                      |
+|-----------------|----------------------------------------------------|
+| `from_name`     | The name in front of the email                     |
+| `driver`        | The maildriver specified in config('mail.mailers') |
+| `reply_to_mail` | email to reply to                                  |
+| `reply_to_name` | name to reply to                                   |
+| `return_path`   | path of return                                     |
 
 ## Usage
 
-One may send a mail using `\MultiMail` instead of `\Mail`. The methods `to`, `cc`, `bcc`, `locale` are exactly the same as provided by the [mail facade](https://laravel.com/docs/5.8/mail#sending-mail) (note that `locale` is only available since Laravel 5.6).
-
-The `from` method from `MultiMail` needs a string of an email provided in `config/multimail.php`. You can pass optionaly a second parameter as from name instetad of using the default falue given in the config.
-When using `send` or `queue` the mail will be send from the mail account specified in `cofing/multimail.php`.
+You have to call "from" method from MultiMail, providing an email from `config/multimail.php`.
 
 ### Basic Examples
 
 This example assumes that `office@example.net` and `contact@example.net` have been specified in `config/multimail.php`.
 
     // Send mail from office@example.net
-    \MultiMail::to($user)->from('office@example.com')->send(new \App\Mail\Invitation($user));
+    \MultiMail::from('office@example.com')->to($user)->send(new \App\Mail\Invitation($user));
 
     // Send from malaccount email@gmail.com
-    \MultiMail::to($user)->from('email@example.net')->locale('en')->send(new \App\Mail\Invitation($user));
+    \MultiMail::from('email@example.net')->to($user)->locale('en')->send(new \App\Mail\Invitation($user));
 
-### Queued Mails
+## Upgrade guide from 1.* to 2.*
 
-Queued mails work exactly the same as for the normal [Mail](https://laravel.com/docs/5.8/mail#queueing-mail) facade,
-i.e. they are either send explicitly be the `queue` method or the mailable class implements the `ShouldQueue` contract.
+1. The provider array has been removed from the MultiMail config. Maildriver belong now to config('mail.mailers')
+2. You cannot set the `fromMailer` attribute in Mailables anymore. 
+3. MultiMail must be followed immediately by "from". `` \MultiMail::to($user)->from('email@example.net')` is not allowed.
+4. The setting `use_default_mail_facade_in_tests` has been removed from the config.
 
-    // Queue Mail
-    \MultiMail::from('contact@foo.org')->queue(new \App\Mail\Invitation($user));
-
-It is of course necessary to install a [queue driver](https://laravel.com/docs/5.8/queues#driver-prerequisites).
-
-### Specify in mailable
-
-You may set `to`, `cc`, `bcc`, `locale` and `from`  in your mailable class. In this case, you could reduce the basic example from above to:
-
-    // Send mail from office@example.net
-    \MultiMail::send(new \App\Mail\Invitation($user));
-
-Mailable:
-
-    /**
-     * Create a new message instance.
-     *
-     * @return void
-     */
-    public function __construct($user)
-    {
-      $this->to  = $user;
-      $this->fromMailer = 'office@example.com'
-      $this->locale('en');
-    }
-
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build()
-    {
-        return $this->markdown('emails.invitation')
-                    ->subject('Invitation mail');
-    }
-    
-    
-
-### Bulk messages
-
-For bulk messages, you may first require a mailer object. You can define a pause in seconds ($timeout) after a number of mails ($frequency) has been send.
-
-	$mailer = \MultiMail::getMailer('office@example.com' , $timeout, $frequency);
-
-Then you can iterate through your list.
-
-    foreach($users as $user){
-	$mailer->send(new \App\Mail\Invitation($user));
-    };
-
-
-## Special Settings
-
-### Multiple Mail Providers
-
-If you wish to send from mails with different provider, then you may create another provider in the `provider` array and reference it inside the `emails` array:
-
-
-    'emails'  => [
-        'office@example.net' =>
-            [
-              'pass'     => env('first_mail_password'),
-              'username' => env('first_mail_username'),
-              'from_name'     => "Max Musterman",   
-                                                        // <------ no provider given because 'default' provider is used
-            ],
-        'contact@other_domain.net'  =>
-            [
-              'pass'     => env('second_mail_password'),
-              'username' => env('second_mail_username'),
-              'from_name'     => "Alice Armania",
-              'provider' => 'new_provider',            // <------ specify new provider here
-            ],
-    ],
-
-    'provider' => [
-      'default' =>
-        [
-          'host'       => env('MAIL_HOST'),
-          'port'       => env('MAIL_PORT'),
-          'encryption' => env('MAIL_ENCRYPTION'),
-          'driver'     => env('MAIL_DRIVER'),
-        ],
-      'new_provider' =>
-        [
-          'host'      => env('MAIL_HOST_PROVIDER_B'),
-          'port'      => env('MAIL_PORT_PROVIDER_B'),
-          'encryption' => env('MAIL_ENCRYPTION_PROVIDER_B'),
-	  'driver'     => env('MAIL_DRIVER_B'),
-	  // you may also add options like `stream`, `source_ip` and `local_domain`
-        ]'
-    ],
-
-
-
-### Default mailaccount
-
-You may provide `default` credentials inside the `email` array from `config/multimail.php`:
-
-    'emails'  => [
-        'office@example.net' =>
-            [
-              'pass'     => env('first_mail_password'),
-              'username' => env('first_mail_username'),
-              'from_name'     => "Max Musterman",
-            ],
-        'contact@example.net'  =>
-            [
-              'pass'     => env('second_mail_password'),
-              'username' => env('second_mail_username'),
-              'from_name'     => "Alice Armania",
-            ],
-        'default' =>
-          [
-            'pass'            => env('MAIL_PASSWORD'),
-            'username'        => env('MAIL_USERNAME'),
-          ]
-    ],
-
-When `first_mail_password` and `first_mail_username` are empty, `office@example.net` will use credentials specified by `default`. This is useful for your local development, when you want to send all mails from one mailaccount while testing. This way you only need to specify `MAIL_PASSWORD` and `MAIL_USERNAME` locally.
-
-## Testing
-
-#### Don't put credentials in local `env`
-
-Do not specify any email accounts in your local `.env`. Otherwise you may risk to send testing mails to actual users.
-
-#### Use one fake mail account or log
-
-Use `log` driver or setup a fake mail SMTP account like [mailtrap](https://mailtrap.io/) or similar services.
-
-It is not needed to specify the same credentials for all your email accounts. Instead, simply provide a default mail account (see above `Default mail account`).
-
-#### Use log mail driver on testing
-
-To avoid latency, I recommend to always use the `log` mail driver when `phpunit` is running. You can set the mail driver in your `phpunit.xml` file like this: `<env name="MAIL_DRIVER" value="log"/>`.
-
-#### Use Mocking
-
-If you want to use the mocking feature [Mail fake](https://laravel.com/docs/mocking#mail-fake) during your tests, enable `use_default_mail_facade_in_tests`
-in your config file `config/multimail.php`. Note that `assertQueued` will never be true, because `queued` mails are actually send through `sent` through a job.
-
-### Get Mail From Database
+## Get Mail From Database
 
 If you want to load your mail account configuration from database
 publish the package migrations:
@@ -288,11 +145,21 @@ then the default profider from `config/multimail.php` will be considerd.
 If you want to make customizations, copy the class `\IWasHereFirst2\LaravelMultiMail\DatabaseConfigMailSettings`
 somewhere in your application, adjust the namespace, and update the reference `mail_settings_class` in your config file.
 
-## Troubleshoot
+## Testing
 
-#### Laravel 7 is not working
+#### Don't put credentials in local `env`
 
-Please update to version 1.2.2 to support Laravel 7
+Do not specify any email accounts in your local `.env`. Otherwise you may risk to send testing mails to actual users.
+
+#### Use one fake mail account or log
+
+Use `log` driver or setup a fake mail SMTP account like [mailtrap](https://mailtrap.io/) or similar services.
+
+It is not needed to specify the same credentials for all your email accounts. Instead, simply provide a default mail account (see above `Default mail account`).
+
+#### Use log mail driver on testing
+
+To avoid latency, I recommend to always use the `log` mail driver when `phpunit` is running. You can set the mail driver in your `phpunit.xml` file like this: `<env name="MAIL_DRIVER" value="log"/>`.
 
 ## For Package Developer
 
