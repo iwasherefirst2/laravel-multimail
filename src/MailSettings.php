@@ -4,60 +4,17 @@ namespace IWasHereFirst2\LaravelMultiMail;
 
 interface MailSettings
 {
-    public function initialize($key);
+    public function setKey($identifier): void;
 
-    /**
-     * Check if log driver is currently used.
-     *
-     * @return boolean
-     */
-    public function isLogDriver();
+    public function getDriver(): array;
 
-    /**
-     * Get provider.
-     *
-     * @return array
-     */
-    public function getProvider();
+    public function getFromName(): string|null;
 
-    /**
-     * Get setting.
-     *
-     * @return array
-     */
-    public function getSetting();
+    public function getReplyTo(): array|null;
 
-    /**
-     * Return email of sender.
-     *
-     * @return string
-     */
-    public function getFromEmail();
+    public function getEmail(): string;
 
-    /**
-     * Return name of sender.
-     *
-     * @return string
-     */
-    public function getFromName();
+    public function getReturnPath(): string|null;
 
-    /**
-     * Return email of sender.
-     *
-     * @return string
-     */
-    public function getReplyEmail();
-
-    /**
-     * Return name of sender.
-     *
-     * @return string
-     */
-    public function getReplyName();
-
-    /**
-     * Return email
-     * @return string
-     */
-    public function getEmail();
+    public function getDriverName(): string;
 }

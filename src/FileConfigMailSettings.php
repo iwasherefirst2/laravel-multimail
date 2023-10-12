@@ -1,200 +1,113 @@
 <?php
 
-
 namespace IWasHereFirst2\LaravelMultiMail;
 
-use \IWasHereFirst2\LaravelMultiMail\MailSettings;
+use IWasHereFirst2\LaravelMultiMail\Exceptions\InvalidConfigKeyException;
 
 class FileConfigMailSettings implements MailSettings
 {
-    /**
-     * Name from mail sender.
-     *
-     * @var string
-     */
-    private $name;
+    private array $multimailConfig;
+    private $identifier;
 
-    /**
-     * Email from mail sender.
-     * Has to be set in `config/multimail.php`
-     *
-     * @var string
-     */
-    private $email;
-
-    /**
-     * Driver, Host, Port & Encryption.
-     *
-     * @var array
-     */
-    private $provider;
-
-    /**
-     * Email settings.
-     * This may include credentials, name, provider.
-     *
-     * @var array
-     */
-    private $settings;
-
-    public function initialize($key)
+    public function __construct(private readonly DefaultLaravelMailDriver $defaultLaravelMailDriver)
     {
-        $this->parseEmail($key);
+    }
 
-        try {
-            $this->settings   = config('multimail.emails')[$this->email];
-        } catch (\Exception $e) {
-            throw new Exceptions\EmailNotInConfigException($this->email);
+    public function setKey($identifier): void
+    {
+        $this->identifier = $identifier;
+    }
+
+    public function getDriverName(): string
+    {
+        $config = $this->getMultiMailConfig();
+        if (!empty($config['emails'][$this->identifier]['driver'])) {
+            return $config['emails'][$this->identifier]['driver'];
         }
 
-        if (empty($this->name)) {
-            $this->name = $this->settings['from_name'] ?? null;
+        $driver = $this->getDefaultDriver();
+
+        if (empty($driver)) {
+            throw new \Exception('No driver name specified');
         }
 
-        $this->loadProvider();
+        return $driver;
+    }
 
-        // If credentials are empty, load default values.
-        // This makes local testing for many emails
-        // very convenient.
-        if ($this->isEmpty()) {
-            $this->loadDefault();
+    public function getDriver(): array
+    {
+        $config = $this->getMultiMailConfig();
+
+        // Backwards compatibility for MultiMail 1.* config
+        if (!empty($config['emails'][$this->identifier]['driver'])) {
+            $driver = $config['emails'][$this->identifier]['driver'];
+
+            if (!empty($config['provider'][$driver])) {
+                return $config['provider'][$driver];
+            }
         }
 
-        return $this;
-    }
-    /**
-     * Check if log driver is used.
-     *
-     * @return boolean
-     */
-    public function isLogDriver()
-    {
-        return (isset($this->provider['driver']) && $this->provider['driver'] == 'log');
-    }
-
-    /**
-     * Get provider.
-     *
-     * @return array
-     */
-    public function getProvider()
-    {
-        return $this->provider;
-    }
-
-    /**
-     * Get setting.
-     *
-     * @return array
-     */
-    public function getSetting()
-    {
-        return $this->settings;
-    }
-
-    /**
-     * Return email of sender.
-     *
-     * @return string
-     */
-    public function getFromEmail()
-    {
-        return $this->settings['from_mail'] ?? $this->email;
-    }
-
-    /**
-     * Return name of sender.
-     *
-     * @return string
-     */
-    public function getFromName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Return email of sender.
-     *
-     * @return string
-     */
-    public function getReplyEmail()
-    {
-        return $this->settings['reply_to_mail'] ?? null;
-    }
-
-    /**
-     * Return name of sender.
-     *
-     * @return string
-     */
-    public function getReplyName()
-    {
-        return $this->settings['reply_to_name'] ?? null;
-    }
-
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * Check if email, pass and username are not empty
-     *
-     * @return boolean
-     */
-    private function isEmpty()
-    {
-        return (empty($this->email) || empty($this->settings) || empty($this->settings['pass']) || empty($this->settings['username']));
-    }
-
-    /**
-     * Load default setting. If default setting is
-     * invalid throw exception
-     *
-     * @return void
-     */
-    private function loadDefault()
-    {
-        $this->settings = config('multimail.emails.default');
-
-        $this->loadProvider();
-
-        if ((!isset($this->provider['driver']) || $this->provider['driver'] != 'log') && (empty($this->settings['pass']) || empty($this->settings['username']))) {
-            throw new Exceptions\NoDefaultException($this->email);
-        }
-    }
-
-    /**
-     * Parse $key into email and possible from name
-     *
-     * @param  mixed string/array
-     * @return void
-     */
-    private function parseEmail($key)
-    {
-        if (!is_array($key)) {
-            $this->email = $key;
-            return;
+        // Backwards compatibility for MultiMail 1.* config
+        if (!empty($config['provider']['default'])) {
+            return $config['provider']['default'];
         }
 
-        $this->name = $key['name'] ?? null;
-
-        if (empty($key['email'])) {
-            throw new Exceptions\InvalidConfigKeyException;
+        if (!isset($driver)) {
+            $driver = $this->defaultLaravelMailDriver->getDefaultDriver();
         }
 
-        $this->email = $key['email'];
+        if ($driver === null) {
+            throw new InvalidConfigKeyException('No mail driver found');
+        }
+
+        $laravelConfig = $this->defaultLaravelMailDriver->getLaravelConfig($driver);
+
+        if ($laravelConfig === null) {
+            throw new \Exception("Mailer [{$driver}] is not defined.");
+        }
+
+        return $laravelConfig;
     }
 
-
-    private function loadProvider()
+    public function getFromName(): string|null
     {
-        if (!empty($this->settings['provider'])) {
-            $this->provider = config('multimail.provider.' . $this->settings['provider']);
+        return $this->getNullOrKey('from_name');
+    }
+
+    public function getReplyTo(): string|null
+    {
+        return $this->getNullOrKey('reply_to');
+    }
+
+    public function getReturnPath(): string|null
+    {
+        return $this->getNullOrKey('return_path');
+    }
+
+    public function getEmail(): string
+    {
+        return $this->identifier;
+    }
+
+    private function getNullOrKey(string $key): string|null
+    {
+        if (empty($this->getMultiMailConfig($this->identifier)[$key])) {
+            return null;
         }
 
-        if (empty($this->provider)) {
-            $this->provider = config('multimail.provider.default');
+        return $this->getMultiMailConfig($this->identifier)[$key];
+    }
+
+    private function getMultiMailConfig(string|null $email = null): array
+    {
+        if (isset($this->multimailConfig)) {
+            $this->multimailConfig = config('multimail');
         }
+
+        if ($email != null) {
+            return $this->multimailConfig[$email];
+        }
+
+        return $this->multimailConfig;
     }
 }
