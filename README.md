@@ -22,6 +22,9 @@ Queued mails work aswell.
 - [For Package Developer](#for-package-developer)
 
 ## Do I need this Package
+
+### Laravel 
+
 Since [Laravel 7](https://laravel.com/docs/7.x/upgrade) you can define multiple mail driver
 and specify the mailer on the [Mail facade](https://laravel.com/docs/7.x/mail#sending-mail):
 
@@ -31,9 +34,16 @@ Mail::mailer('postmark')
         ->send(new OrderShipped($order));
 ```
 
-The `from` mail address can be defined globally or for each mailable: https://laravel.com/docs/7.x/mail#configuring-the-sender
+The `from` mail address can be defined for each mailable: https://laravel.com/docs/7.x/mail#configuring-the-sender
 
-The difference to MultiMail is, that in MultiMail you specify the mail driver to an email. So it would look like this:
+Thus, since Laravel 7, you can send from multiple mail accounts. However, you need to specifiy the mail driver on the mail facade and the 
+"from" mail address in the Mailable.
+
+### MultiMail Package
+
+In the MultiMail package, the email and mail driver combination is stored either in `config/multimail.php` or in the database.
+Thus, the mail driver does not need to be mentioned explicitly.
+When using MultiMail, sending an email may look like this:
 
 ``` 
 MultiMail::from('info@example.com')
@@ -41,14 +51,16 @@ MultiMail::from('info@example.com')
         ->send(new OrderShipped($order));
 ```
 
-You don't need to specify the "from" email in the Mailable.
+The "from" does not need to be specified in the Mailable. If you do specify an "from" name in the Mailable, it will
+overwrite the MultiMail setting.
 
+### Summary
 
-Thus, I can only think of three cases where the current package could be useful for you:
+The following three cases are situations where the package may be beneficial to you:
 
-- You need support to send mails from multiple accounts for a Laravel 5 or 6 application. Then please follow manual for [Multimail 1.3.7](https://github.com/iwasherefirst2/laravel-multimail/tree/1.3.7)
-- You want to send mails from mailaccouns that are stored in a database
-- You don't want to define the "from" email in the Mailable
+- You need support to send mails from multiple accounts for a Laravel 5 or 6 application.
+- You want to send mails from mail accounts that are stored in a database
+- You don't want to define the "from" email in the Mailable and the "driver" on the facade separately.
 
 ## Requirements
 
