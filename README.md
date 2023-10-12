@@ -16,9 +16,9 @@ Queued mails work aswell.
 - [Requirments](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Upgrade guide from 1.* to 2.*](#upgrade-guide-from-1-to-2) 
 - [Get Mail From Database](#get-mail-from-database)
-- [Testing](#testing) 
+- [Testing](#testing)
+- [Upgrade guide from 1.* to 2.*](#upgrade-guide-from-1-to-2)
 - [For Package Developer](#for-package-developer)
 
 ## Do I need this Package
@@ -121,12 +121,6 @@ This example assumes that `office@example.net` and `contact@example.net` have be
     // Send from malaccount email@gmail.com
     \MultiMail::from('email@example.net')->to($user)->locale('en')->send(new \App\Mail\Invitation($user));
 
-## Upgrade guide from 1.* to 2.*
-
-1. The provider array has been removed from the MultiMail config. Maildriver belong now to config('mail.mailers')
-2. You cannot set the `fromMailer` attribute in Mailables anymore. 
-3. MultiMail must be followed immediately by "from". `` \MultiMail::to($user)->from('email@example.net')` is not allowed.
-4. The setting `use_default_mail_facade_in_tests` has been removed from the config.
 
 ## Get Mail From Database
 
@@ -172,6 +166,14 @@ It is not needed to specify the same credentials for all your email accounts. In
 #### Use log mail driver on testing
 
 To avoid latency, I recommend to always use the `log` mail driver when `phpunit` is running. You can set the mail driver in your `phpunit.xml` file like this: `<env name="MAIL_DRIVER" value="log"/>`.
+
+
+## Upgrade guide from 1.* to 2.*
+
+1. The provider array has been removed from the MultiMail config. Maildriver belong now to config('mail.mailers')
+2. You cannot set the `fromMailer` attribute in Mailables anymore.
+3. MultiMail must be followed immediately by "from". `` \MultiMail::to($user)->from('email@example.net')` is not allowed.
+4. The setting `use_default_mail_facade_in_tests` has been removed from the config.
 
 ## For Package Developer
 
