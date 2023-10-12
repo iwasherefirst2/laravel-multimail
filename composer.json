@@ -10,6 +10,10 @@
             "email": "info@adam-nielsen.de"
         }
     ],
+    "require": {
+        "php": "^7.3|^8.0",
+        "laravel/framework": "^9.0|^10.0",
+    },
     "require-dev": {
         "orchestra/testbench": "^4.0",
         "guzzlehttp/guzzle": "^6.4"
