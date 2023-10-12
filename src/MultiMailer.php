@@ -6,15 +6,13 @@ use \Illuminate\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Traits\Macroable;
-use Swift_Mailer;
-use Swift_Plugins_AntiFloodPlugin;
 
 class MultiMailer
 {
     use Macroable;
 
     /**
-     * Plugins for Swift_Mailer
+     * Plugins for Symphony Email
      * @var array
      */
     protected $plugins;
@@ -56,21 +54,21 @@ class MultiMailer
             return $this->mailers[$config->getEmail()];
         }
 
-        $swift_mailer = $this->getSwiftMailer($config);
+        $symphony_mailer = $this->getSymphonyMailer($config);
 
         if (!$config->isLogDriver() && !empty($timeout) && !empty($frequency)) {
             $this->plugins[] = new Swift_Plugins_AntiFloodPlugin($frequency, $timeout);
         }
 
-        $this->registerPlugins($swift_mailer);
+        $this->registerPlugins($symphony_mailer);
 
         $view   = app()->get('view');
         $events = app()->get('events');
 
         if (version_compare(app()->version(), '7.0.0') >= 0) {
-            $mailer = new Mailer(config('app.name'), $view, $swift_mailer, $events);
+            $mailer = new Mailer(config('app.name'), $view, $symphony_mailer, $events);
         } else {
-            $mailer = new Mailer($view, $swift_mailer, $events);
+            $mailer = new Mailer($view, $symphony_mailer, $events);
         }
 
         $mailer->alwaysFrom($config->getFromEmail(), $fromName ?? $config->getFromName());
@@ -223,30 +221,24 @@ class MultiMailer
     }
 
     /**
-     * Create SwiftMailer with timeout/frequency. Timeout/frequency is ignored
+     * Create SymphonyMailer with timeout/frequency. Timeout/frequency is ignored
      * when Log Driver is used.
      *
      * @param  array
-     * @return Swift_Mailer
+     * @return Symphony Email
      */
-    protected function getSwiftMailer($config)
+    protected function getSymphonyMailer($config)
     {
-        if ($config->isLogDriver()) {
-            $transport = TransportManager::createLogDriver();
-
-            return new Swift_Mailer($transport);
-        }
-
         $transport = TransportManager::createSmtpDriver($config);
 
-        return new Swift_Mailer($transport);
+        return $transport;
     }
 
-    protected function registerPlugins($swift_mailer)
+    protected function registerPlugins($symphony_mailer)
     {
         if (!empty($this->plugins)) {
             foreach ($this->plugins as $plugin) {
-                $swift_mailer->registerPlugin($plugin);
+                $symphony_mailer->registerPlugin($plugin);
             }
         }
     }
