@@ -30,7 +30,25 @@ This package works for `SMTP` and `log` drivers.
 
 ## Requirements
 
-Laravel 5, 6 or 7
+Laravel 9 or 10
+
+## Do you need this package?
+
+Since [Laravel 7](https://laravel.com/docs/7.x/upgrade) you can define multiple mail driver
+and specify the mailer on the [Mail facade](https://laravel.com/docs/7.x/mail#sending-mail):
+
+``` 
+Mail::mailer('postmark')
+        ->to($request->user())
+        ->send(new OrderShipped($order));
+```
+
+The `from` mail address can be defined globally or for each mailable: https://laravel.com/docs/7.x/mail#configuring-the-sender
+
+Those two options combined allow you to send from multiple mail accounts.
+So for most use-cases, this package is probably no longer needed
+
+
 
 ## Installation
 
