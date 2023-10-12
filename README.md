@@ -11,7 +11,8 @@ The package supports sending queued, localized and bulk mails.
 
 This package works for `SMTP` and `log` drivers.
 
-**PLEASE CHECK IF YOU EVEN NEED THE PACKAGE**
+---
+## PLEASE CHECK IF YOU EVEN NEED THE PACKAGE <a name="check-package"></a>
 
 Since [Laravel 7](https://laravel.com/docs/7.x/upgrade) you can define multiple mail driver
 and specify the mailer on the [Mail facade](https://laravel.com/docs/7.x/mail#sending-mail):
@@ -26,6 +27,7 @@ The `from` mail address can be defined globally or for each mailable: https://la
 
 Those two options combined allow you to send from multiple mail accounts.
 So for most use-cases, this package is probably no longer needed.
+---
 
 ## Table of Contents
 
@@ -46,7 +48,15 @@ So for most use-cases, this package is probably no longer needed.
 
 ## Requirements
 
-Laravel 9 or 10
+| Laravel Version | MultiMail Version |
+|-----------------|-------------------|
+| 5,6,7,8         | 1.3.7             |
+| 9, 10           | 2.*               |
+
+
+Please [check](#check-package) if you even need this package.
+Since version 7, sending from multiple accounts is possible 
+by Laravel core.
 
 ## Installation
 
