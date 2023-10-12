@@ -27,6 +27,7 @@ The `from` mail address can be defined globally or for each mailable: https://la
 
 Those two options combined allow you to send from multiple mail accounts.
 So for most use-cases, this package is probably no longer needed.
+
 ---
 
 ## Table of Contents
